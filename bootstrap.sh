@@ -1,0 +1,10 @@
+
+apt install -y build-essential
+apt install -y dh-autoreconf
+apt install -y libcurl4-gnutls-dev
+apt install -y libexpat1-dev
+apt install -y gettext
+apt install -y zlib1g-dev
+apt install -y libssl-dev
+apt install -y libncurses5-dev
+apt install -y git
