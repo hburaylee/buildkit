@@ -1,18 +1,14 @@
 #! /usr/bin/env bash
 
-echo ""
-echo "This may take some time, please sit back and take a coffee."
-echo ""
+echo ">>> build git"
 
-mkdir -p output
-git clone https://github.com/git/git -b v2.53.0
-cd git
+[ ! -d git ] && git clone https://github.com/git/git -b v2.53.0
+pushd git
+	# export NO_OPENSSL=1
+	# export NO_CURL=1
+	export CFLAGS="${CFLAGS} -static -O2"
 
-export NO_OPENSSL=1
-export CFLAGS="${CFLAGS} -static"
-
-make configure
-./configure prefix=/usr/local
-make
-make install
-make clean
+	make configure
+	./configure prefix=/usr/local
+	make -j $(nproc) git
+popd
