@@ -39,8 +39,32 @@ install_zellij()
         wget https://github.com/zellij-org/zellij/releases/download/${zellij_release}/zellij-x86_64-unknown-linux-musl.tar.gz
     fi
     tar -xf zellij-x86_64-unknown-linux-musl.tar.gz -C ${insdir}/
+    chmod a+x ${insdir}/zellij
 
+    [ ! -d ~/.config/zellij ] && mkdir -p ~/.config/zellij
+    cp -f config/zeiilj.kdl ~/.config/zellij/config.kdl
+
+    [ -e zellij-x86_64-unknown-linux-musl.tar.gz ] && rm -f zellij-x86_64-unknown-linux-musl.tar.gz
     # sed -i 's|// mouse_mode false|mouse_mode false|' ~/.config/zellij/config.kdl
+}
+
+install_ripgrep()
+{
+    local insdir=/usr/local/bin
+    local pkgname="ripgrep"
+    local release="15.1.0"
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    if [ ! -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ]; then
+        wget https://github.com/BurntSushi/${pkgname}/releases/download/${release}/${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
+    fi
+    [ -d ${pkgname}-${release}-x86_64-unknown-linux-musl ] && rm -rf ${pkgname}-${release}-x86_64-unknown-linux-musl
+    tar -xf ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
+    cp -f ${pkgname}-${release}-x86_64-unknown-linux-musl/rg ${insdir}/
+    chmod a+x ${insdir}/rg
+    [ -d ${pkgname}-${release}-x86_64-unknown-linux-musl ] && rm -rf ${pkgname}-${release}-x86_64-unknown-linux-musl
+    [ -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
 }
 
 install_vimll()
