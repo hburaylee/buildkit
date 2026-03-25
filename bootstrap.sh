@@ -39,6 +39,8 @@ install_zellij()
         wget https://github.com/zellij-org/zellij/releases/download/${zellij_release}/zellij-x86_64-unknown-linux-musl.tar.gz
     fi
     tar -xf zellij-x86_64-unknown-linux-musl.tar.gz -C ${insdir}/
+
+    # sed -i 's|// mouse_mode false|mouse_mode false|' ~/.config/zellij/config.kdl
 }
 
 install_vimll()
