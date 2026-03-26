@@ -64,6 +64,18 @@ install_delta()
     blame-timestamp-output-format = "%Y-%m-%d %H:%M"
     blame-format = "{commit:<8} {timestamp:<16} {author:<18}"
 EOF
+
+    for rcfile in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [ -e "$rcfile" ]; then
+            if ! grep -q "^alias git-cm=" "$rcfile" 2>/dev/null; then
+                echo "alias git-cm='git commit -s -a'" >> "$rcfile"
+            fi
+
+            if ! grep -q "^alias git-log=" "$rcfile" 2>/dev/null; then
+                echo "alias git-log='git log --pretty=format:\"%h - %an %ae, %ar : %s\"'" >> "$rcfile"
+            fi
+        fi
+    done
 }
 
 install_bat()
@@ -84,16 +96,13 @@ install_bat()
     [ -d ${pkgname}-${release}-x86_64-unknown-linux-musl ] && rm -rf ${pkgname}-${release}-x86_64-unknown-linux-musl
     [ -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
 
-    if [ -e $HOME/.bashrc ]; then
-        if ! grep -q "^alias cat=" "$HOME/.bashrc" 2>/dev/null; then
-            echo "alias cat='bat -pp'" >> "$HOME/.bashrc"
+    for rcfile in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [ -e "$rcfile" ]; then
+            if ! grep -q "^alias cat=" "$rcfile" 2>/dev/null; then
+                echo "alias cat='bat -pp'" >> "$rcfile"
+            fi
         fi
-    fi
-    if [ -e $HOME/.zshrc ]; then
-        if ! grep -q "^alias cat=" "$HOME/.zshrc" 2>/dev/null; then
-            echo "alias cat='bat -pp'" >> "$HOME/.zshrc"
-        fi
-    fi
+    done
 }
 
 install_zellij()
