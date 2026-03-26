@@ -25,7 +25,73 @@ install_apt()
 install_rust()
 {
     export RUSTUP_DIST_SERVER="https://rsproxy.cn"
-    curl https://sh.rustup.rs -sSf | sh
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+}
+
+install_delta()
+{
+    local insdir=/usr/local/bin
+    local pkgname="delta"
+    local release="0.18.2"
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    if [ ! -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ]; then
+        wget https://github.com/dandavison/delta/releases/download/${release}/delta-${release}-x86_64-unknown-linux-musl.tar.gz
+    fi
+    [ -d delta-${release}-x86_64-unknown-linux-musl ] && rm -rf delta-${release}-x86_64-unknown-linux-musl
+    tar -xf delta-${release}-x86_64-unknown-linux-musl.tar.gz
+    cp -f delta-${release}-x86_64-unknown-linux-musl/delta ${insdir}/
+    chmod a+x ${insdir}/delta
+    [ -d delta-${release}-x86_64-unknown-linux-musl ] && rm -rf delta-${release}-x86_64-unknown-linux-musl
+    [ -e delta-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f delta-${release}-x86_64-unknown-linux-musl.tar.gz
+
+    cat > ${HOME}/.gitconfig <<EOF
+[color]
+    ui = auto
+[core]
+    editor = vi
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
+    dark = true
+    blame-code-style = syntax
+    blame-palette = "#55007f #7f007f #7f7f00 #aa0044 #44aa00 #0044aa #007f7f #007f00"
+    blame-timestamp-output-format = "%Y-%m-%d %H:%M"
+    blame-format = "{commit:<8} {timestamp:<16} {author:<18}"
+EOF
+}
+
+install_bat()
+{
+    local insdir=/usr/local/bin
+    local pkgname="bat"
+    local release="v0.26.1"
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    if [ ! -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ]; then
+        wget https://github.com/sharkdp/${pkgname}/releases/download/${release}/${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
+    fi
+    [ -d ${pkgname}-${release}-x86_64-unknown-linux-musl ] && rm -rf ${pkgname}-${release}-x86_64-unknown-linux-musl
+    tar -xf ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
+    cp -f ${pkgname}-${release}-x86_64-unknown-linux-musl/bat ${insdir}/
+    chmod a+x ${insdir}/bat
+    [ -d ${pkgname}-${release}-x86_64-unknown-linux-musl ] && rm -rf ${pkgname}-${release}-x86_64-unknown-linux-musl
+    [ -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
+
+    if [ -e $HOME/.bashrc ]; then
+        if ! grep -q "^alias cat=" "$HOME/.bashrc" 2>/dev/null; then
+            echo "alias cat='bat -pp'" >> "$HOME/.bashrc"
+        fi
+    fi
+    if [ -e $HOME/.zshrc ]; then
+        if ! grep -q "^alias cat=" "$HOME/.zshrc" 2>/dev/null; then
+            echo "alias cat='bat -pp'" >> "$HOME/.zshrc"
+        fi
+    fi
 }
 
 install_zellij()
