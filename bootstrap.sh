@@ -20,6 +20,7 @@ install_apt()
     apt install -y git
     apt install -y iputils-ping
     apt install -y lrzsz
+    apt install -y tmux
 }
 
 install_rust()
