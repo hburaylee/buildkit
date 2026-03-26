@@ -14,6 +14,7 @@ install_apt()
     apt install -y libssl-dev
     apt install -y libncurses5-dev
     apt install -y libpcre2-dev
+    apt install -y python3
     apt install -y make
     apt install -y gcc
     apt install -y autoconf
