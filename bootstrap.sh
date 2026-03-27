@@ -28,6 +28,14 @@ install_rust()
 {
     export RUSTUP_DIST_SERVER="https://rsproxy.cn"
     curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+    for rcfile in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [ -e "$rcfile" ]; then
+            if ! grep -q '\.cargo/env"' "$rcfile" 2>/dev/null; then
+                echo '. "$HOME/.cargo/env"' >> $rcfile
+            fi
+        fi
+    done
 }
 
 install_delta()
