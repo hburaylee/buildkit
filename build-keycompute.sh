@@ -93,9 +93,9 @@ EOF
 
     # 设置密码和创建数据库
     su postgres -c "psql" << EOF
-ALTER USER postgres WITH PASSWORD 'your_strong_password';
+ALTER USER postgres WITH PASSWORD 'AFR&@6C%rrkiC!w4wr0qkMBn';
+CREATE USER keycompute WITH PASSWORD 'OIM9oOP8uJmgXSQmE+dMlnDbauMXCBCho1CPhEzOxa8=';
 CREATE DATABASE keycompute OWNER keycompute;
-CREATE USER keycompute WITH PASSWORD 'ObpipdGz00wLxK1u1OupDP4rWVu1NEUpB5QGIiIGbek=';
 GRANT ALL PRIVILEGES ON DATABASE keycompute TO keycompute;
 EOF
 
@@ -109,7 +109,7 @@ EOF
     fi
 
     echo "Testing Redis connection..."
-    redis-cli -a "1VoCAza2HoaOmCafAdM+oxj165CiYpgp2XmD9tTeLN0=" ping > /dev/null 2>&1
+    redis-cli -a "L4Y922nQ77ZxuV4SKT1VUmBSchLRI4UUbr5iRYeJWy8=" ping > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         echo "Redis is responding"
     else
@@ -127,7 +127,7 @@ stop_services() {
     su postgres -c "${PG_BIN}/pg_ctl stop -D ${PG_DATA}"
 
     echo "Stopping Redis..."
-    redis-cli -a "1VoCAza2HoaOmCafAdM+oxj165CiYpgp2XmD9tTeLN0=" shutdown
+    redis-cli -a "L4Y922nQ77ZxuV4SKT1VUmBSchLRI4UUbr5iRYeJWy8=" shutdown
 
     echo "Services stopped"
 }
@@ -140,8 +140,8 @@ if [ -n "$1" ]; then
         stop_services
     fi
     if [ server == "$1" ]; then
-        export KC__DATABASE__URL="postgres://keycompute:ObpipdGz00wLxK1u1OupDP4rWVu1NEUpB5QGIiIGbek=@localhost:5432/keycompute"
-        export KC__REDIS__URL="redis://:1VoCAza2HoaOmCafAdM+oxj165CiYpgp2XmD9tTeLN0=@localhost:6379"
+        export KC__DATABASE__URL="postgres://keycompute:OIM9oOP8uJmgXSQmE+dMlnDbauMXCBCho1CPhEzOxa8=@localhost:5432/keycompute"
+        export KC__REDIS__URL="redis://:L4Y922nQ77ZxuV4SKT1VUmBSchLRI4UUbr5iRYeJWy8=@localhost:6379"
         export KC__AUTH__JWT_SECRET="ea2fe6dd660639d1401c0c4c9fbd71cfe627785ae2359f3b0179efa7c0e24245f966a586295ed598db795da5a942dff7"
         export KC__CRYPTO__SECRET_KEY="H8AS+HwrYBp/KSAWRLh9jcLnsV+SIvOtohDPRun+GXA="
         export KC__EMAIL__SMTP_HOST="smtp.example.com"
@@ -157,7 +157,8 @@ if [ -n "$1" ]; then
         popd
     fi
     if [ front == "$1" ]; then
-        API_BASE_URL=https://b09ocxvoej-3000.cnb.run dx serve --package web --platform web --addr 0.0.0.0
+        BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
+        API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0
     fi
 
     exit 0
