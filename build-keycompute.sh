@@ -8,6 +8,7 @@ apt_install() {
     apt install -y podman
     apt install -y redis
     apt install -y postgresql
+    apt install -y postgresql-contrib
     apt install -y librust-openssl-sys-dev
     apt install -y librust-glib-sys-dev
     apt install -y librust-cairo-sys-rs-dev
