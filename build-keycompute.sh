@@ -151,10 +151,13 @@ if [ -n "$1" ]; then
         export KC__EMAIL__FROM_ADDRESS="noreply@example.com"
         export KC__EMAIL__VERIFICATION_BASE_URL="https://api.example.com"
         export KC__DEFAULT_ADMIN_EMAIL="admin@keycompute.local"
-        export KC__DEFAULT_ADMIN_PASSWORD="Admin@1q2w3e"
+        export KC__DEFAULT_ADMIN_PASSWORD="12345"
         pushd keycompute
             cargo run -p keycompute-server --features redis
         popd
+    fi
+    if [ front == "$1" ]; then
+        API_BASE_URL=https://b09ocxvoej-3000.cnb.run dx serve --package web --platform web --addr 0.0.0.0
     fi
 
     exit 0
