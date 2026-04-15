@@ -168,7 +168,9 @@ if [ -n "$1" ]; then
     fi
     if [ front == "$1" ]; then
         BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
-        API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0
+        pushd keycompute
+            API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0
+        popd
     fi
 
     exit 0
