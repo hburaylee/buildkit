@@ -168,7 +168,7 @@ if [ -n "$1" ]; then
     if [ front == "$1" ]; then
         BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
         pushd keycompute
-            API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0
+            API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0 --port 80
         popd
     fi
 
@@ -183,4 +183,8 @@ dxcli_install
 pushd ${app}
     cargo build --workspace --exclude desktop --exclude mobile --verbose
 popd
+
+# ollama
+# Base URL: http://localhost:11434/api/chat (暂不支持  http://localhost:11434/v1/chat/completions)
+#
 
