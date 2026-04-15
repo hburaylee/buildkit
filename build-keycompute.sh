@@ -21,6 +21,16 @@ apt_install() {
     apt install -y libwebkit2gtk-4.1-dev
 }
 
+dxcli_install() {
+    if ! command -v cargo-binstall 2>&1 > /dev/null; then
+        cargo install cargo-binstall
+    fi
+    if ! command -v dx 2>&1 > /dev/null; then
+        # cargo binstall dioxus-cli@0.7.5 --force
+        cargo install --git https://github.com/DioxusLabs/dioxus dioxus-cli --locked --tag v0.7.1
+    fi
+}
+
 setting_podman() {
     cat >  /etc/containers/registries.conf << EOF
 unqualified-search-registries = ["docker.io"]  # 默认还是搜docker.io
@@ -165,6 +175,7 @@ if [ -n "$1" ]; then
 fi
 
 apt_install
+dxcli_install
 setting_podman
 
 [ ! -d ${app} ] && git clone https://github.com/rayylee/${app}
