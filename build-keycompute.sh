@@ -5,7 +5,7 @@ app="keycompute"
 echo ">>> build ${app}"
 
 apt_install() {
-    apt install -y podman
+    # apt install -y podman
     apt install -y redis
     apt install -y postgresql
     apt install -y postgresql-contrib
@@ -19,16 +19,6 @@ apt_install() {
     apt install -y libsoup-3.0-dev
     apt install -y libjavascriptcoregtk-4.1-dev
     apt install -y libwebkit2gtk-4.1-dev
-}
-
-dxcli_install() {
-    if ! command -v cargo-binstall 2>&1 > /dev/null; then
-        cargo install cargo-binstall
-    fi
-    if ! command -v dx 2>&1 > /dev/null; then
-        # cargo binstall dioxus-cli@0.7.5 --force
-        cargo install --git https://github.com/DioxusLabs/dioxus dioxus-cli --locked --tag v0.7.1
-    fi
 }
 
 setting_podman() {
@@ -48,6 +38,16 @@ location = "docker.xuanyuan.me"   # 轩辕快递, 使命必达
 prefix = "docker.io"
 location = "docker.1panel.live"   # 1Panel专线, 官方认证
 EOF
+}
+
+dxcli_install() {
+    # if ! command -v cargo-binstall 2>&1 > /dev/null; then
+    #     cargo install cargo-binstall
+    # fi
+    if ! command -v dx 2>&1 > /dev/null; then
+        # cargo binstall dioxus-cli@0.7.5 --force
+        cargo install --git https://github.com/DioxusLabs/dioxus dioxus-cli --locked --tag v0.7.1
+    fi
 }
 
 start_services() {
@@ -178,7 +178,7 @@ fi
 
 apt_install
 dxcli_install
-setting_podman
+# setting_podman
 
 [ ! -d ${app} ] && git clone https://github.com/rayylee/${app}
 pushd ${app}
