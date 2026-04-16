@@ -6,6 +6,10 @@
 # Base URL: http://localhost:11434/api/chat (暂不支持  http://localhost:11434/v1/chat/completions)
 #
 
+API_URL="https://4l23vuj5an-3000.cnb.run/v1"
+API_KEY="sk-a116f17b0bf14c4d9e63f449b3d47d91ba9cb36a53f4458c"
+API_MODEL="gemma3:270m"
+
 do_start() {
     nohup ./ollama/bin/ollama serve > ollama.log 2>&1 &
     sleep 1
@@ -15,12 +19,18 @@ do_start() {
 do_chat() {
 
     BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
-    curl -s $BACKEND_URI/v1/chat/completions \
+    curl -s ${API_URL}/chat/completions \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer sk-21158cb317be4ed78072c64e5da105414ba223cf10fe4ba4" \
-        -d '{"model": "gemma3:270m","messages":[{"role": "user","content": "你好"}], "stream":false}'
-}
+        -H "Authorization: Bearer ${API_KEY}" \
+        -d "$(cat <<EOF
+        {
+            "model": "${API_MODEL}",
+            "messages": [{"role": "user", "content": "你好"}], "stream":false
+        }
+EOF
+)"
 
+}
 
 case "$1" in
     start)
