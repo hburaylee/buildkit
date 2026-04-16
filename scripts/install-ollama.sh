@@ -25,6 +25,9 @@ mkdir ollama
 
 tar -I zstd -xvf ollama-linux-amd64.tar.zst -C ./ollama/
 
+# ollama
+# Base URL: http://localhost:11434/api/chat (暂不支持  http://localhost:11434/v1/chat/completions)
+#
 
 # ./ollama/bin/ollama serve
 # ./ollama/bin/ollama run gemma3:270m
