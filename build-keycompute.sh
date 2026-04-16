@@ -168,7 +168,9 @@ if [ -n "$1" ]; then
     if [ front == "$1" ]; then
         BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
         pushd keycompute
-            API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0 --port 80
+            # API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0 --port 80
+            API_BASE_URL="$BACKEND_URI" dx build --package web --platform web
+            python3 -m http.server -d keycompute/target/dx/web/debug/web/public 80
         popd
     fi
 
