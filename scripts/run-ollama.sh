@@ -4,10 +4,10 @@
 
 # ollama
 # Base URL: http://localhost:11434/api/chat (暂不支持  http://localhost:11434/v1/chat/completions)
-#
+#           OLLAMA_BASE=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/11434/g") && echo $OLLAMA_BASE/api/chat
 
-API_URL="https://4l23vuj5an-3000.cnb.run/v1"
-API_KEY="sk-a116f17b0bf14c4d9e63f449b3d47d91ba9cb36a53f4458c"
+API_URL="https://wuot4fa6z8-80.cnb.run/v1"
+API_KEY="sk-daa8bd8af04049918ab2890dba6ab980aab0b7d17ae64f8f"
 API_MODEL="gemma3:270m"
 
 do_start() {
@@ -18,7 +18,6 @@ do_start() {
 
 do_chat() {
 
-    BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
     curl -s ${API_URL}/chat/completions \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${API_KEY}" \
