@@ -45,7 +45,7 @@ dxcli_install() {
     # fi
     if ! command -v dx 2>&1 > /dev/null; then
         # cargo binstall dioxus-cli@0.7.5 --force
-        cargo install --git https://github.com/DioxusLabs/dioxus dioxus-cli --locked --tag v0.7.1
+        cargo install --git https://github.com/DioxusLabs/dioxus dioxus-cli --locked --tag v0.7.3
     fi
 }
 
