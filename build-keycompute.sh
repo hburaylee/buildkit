@@ -181,8 +181,18 @@ apt_install
 dxcli_install
 # setting_podman
 
-[ ! -d ${app} ] && git clone https://github.com/rayylee/${app}
+sync_github() {
+    git remote add github https://github.com/aiqubits/keycompute.git
+    git fetch github
+    git checkout main          # 或你使用的默认分支（如 master）
+    git merge github/main      # 合并 GitHub 的更改
+    git push origin main       # 推送到 GitLab
+}
+
+# [ ! -d ${app} ] && git clone https://github.com/rayylee/${app}
+[ ! -d ${app} ] && git clone https://cnb.cool/rayylee/${app}
 pushd ${app}
+    sync_github
     cargo build --workspace --exclude desktop --exclude mobile --verbose
 popd
 
