@@ -158,7 +158,7 @@ if [ -n "$1" ]; then
         export KC__EMAIL__SMTP_USERNAME="noreply@example.com"
         export KC__EMAIL__SMTP_PASSWORD="your-smtp-password"
         export KC__EMAIL__FROM_ADDRESS="noreply@example.com"
-        export KC__EMAIL__VERIFICATION_BASE_URL="https://api.example.com"
+        export APP_BASE_URL="https://api.example.com"
         export KC__DEFAULT_ADMIN_EMAIL="admin@keycompute.local"
         export KC__DEFAULT_ADMIN_PASSWORD="12345"
         pushd keycompute
@@ -168,9 +168,9 @@ if [ -n "$1" ]; then
     if [ front == "$1" ]; then
         BACKEND_URI=$(echo "$CNB_VSCODE_PROXY_URI" | sed "s/{{port}}/3000/g")
         pushd keycompute
-            # API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0 --port 80
-            API_BASE_URL="$BACKEND_URI" dx build --package web --platform web
-            python3 -m http.server -d keycompute/target/dx/web/debug/web/public 80
+            API_BASE_URL="$BACKEND_URI" dx serve --package web --platform web --addr 0.0.0.0 --port 80
+            # API_BASE_URL="$BACKEND_URI" dx build --package web --platform web
+            # python3 -m http.server -d keycompute/target/dx/web/debug/web/public 80
         popd
     fi
 
@@ -182,7 +182,7 @@ dxcli_install
 # setting_podman
 
 sync_github() {
-    git remote add github https://github.com/aiqubits/keycompute.git
+    git remote add github https://github.com/keycompute/keycompute.git
     git fetch github
     git checkout main          # 或你使用的默认分支（如 master）
     git merge github/main      # 合并 GitHub 的更改
