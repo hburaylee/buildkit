@@ -141,7 +141,41 @@ stop_services() {
     echo "Services stopped"
 }
 
+start_docker() {
+    INPUT_FILE="config/env.keycompute"
+    OUTPUT_FILE="keycompute/.env"
+
+    if [ ! -f "$INPUT_FILE" ]; then
+        echo "Error: not found $INPUT_FILE"
+        exit 1
+    fi
+
+    if [ ! -f "$OUTPUT_FILE" ]; then
+        POSTGRES_PASS=$(openssl rand -base64 32 | tr -d '\n')
+        REDIS_PASS=$(openssl rand -base64 32 | tr -d '\n')
+        JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
+        CRYPTO_KEY=$(openssl rand -base64 32 | tr -d '\n')
+        sed -e "s|change-me-strong-password|$POSTGRES_PASS|g" \
+            -e "s|change-me-redis-password|$REDIS_PASS|g" \
+            -e "s|change-me-jwt-secret-key|$JWT_SECRET|g" \
+            -e "s|change-me-base64-encoded-32-byte-key|$CRYPTO_KEY|g" \
+            "$INPUT_FILE" > "$OUTPUT_FILE"
+        chmod 600 "$OUTPUT_FILE"
+    else
+        echo "Warn: $OUTPUT_FILE exsit"
+    fi
+
+    pushd keycompute
+        docker compose up -d
+        # docker compose up -d --build keycompute-server
+        # docker compose up -d --build keycompute-web
+    popd
+}
+
 if [ -n "$1" ]; then
+    if [ docker == "$1" ]; then
+        start_docker
+    fi
     if [ start == "$1" ]; then
         start_services
     fi
