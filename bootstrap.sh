@@ -6,6 +6,7 @@ install_apt()
     apt update
 
     apt install -y build-essential
+    apt install -y linux-perf
     apt install -y dh-autoreconf
     apt install -y libcurl4-gnutls-dev
     apt install -y libexpat1-dev
