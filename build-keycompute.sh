@@ -152,10 +152,12 @@ start_docker() {
 
     if [ ! -f "$OUTPUT_FILE" ]; then
         POSTGRES_PASS=$(openssl rand -base64 32 | tr -d '\n')
+        NODE_KEY=$(openssl rand -base64 32 | tr -d '\n')
         REDIS_PASS=$(openssl rand -base64 32 | tr -d '\n')
         JWT_SECRET=$(openssl rand -base64 64 | tr -d '\n')
         CRYPTO_KEY=$(openssl rand -base64 32 | tr -d '\n')
         sed -e "s|change-me-strong-password|$POSTGRES_PASS|g" \
+            -e "s|change-me-node-registration-token|$NODE_KEY|g" \
             -e "s|change-me-redis-password|$REDIS_PASS|g" \
             -e "s|change-me-jwt-secret-key|$JWT_SECRET|g" \
             -e "s|change-me-base64-encoded-32-byte-key|$CRYPTO_KEY|g" \
