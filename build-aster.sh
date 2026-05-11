@@ -3,7 +3,7 @@
 app="asterinas"
 docker_tag="0.17.2-20260407"
 
-ws=1
+ws="${WS:-1}"
 mnt_dir="/workspace"
 
 echo ">>> build ${app}"
