@@ -8,7 +8,7 @@ mnt_dir="/workspace"
 
 echo ">>> build ${app}"
 
-sync_github() {
+do_sync() {
     git remote add github https://github.com/asterinas/asterinas
     git fetch github
     git checkout main       # 或你使用的默认分支 (如 master)
@@ -17,24 +17,29 @@ sync_github() {
 }
 
 do_runkernel() {
-    make ENABLE_KVM=1 run_kernel
-}
-
-if [ -n "$1" ]; then
-    if [ "$1" == "run_kernel" ]; then
-        do_runkernel
+    if [ -e /dev/kvm ]; then
+        make ENABLE_KVM=1 run_kernel
+    else
+        make ENABLE_KVM=0 run_kernel
     fi
-    exit 0
-fi
+}
 
 if [ "$ws" != 1 ]; then
     mnt_dir="$PWD/$app"
     [ ! -d ${app} ] && git clone https://cnb.cool/rayylee/asterinas
 fi
 
-pushd ${mnt_dir}
-    sync_github
-popd
+if [ -n "$1" ]; then
+    if [ "$1" == "run_kernel" ]; then
+        do_runkernel
+    elif [ "$1" == "sync" ]; then
+        pushd ${mnt_dir}
+            do_sync
+        popd
+    fi
+    exit 0
+fi
+
 cp -f $0 ${mnt_dir}/
 
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 "asterinas/asterinas" | awk '{print $1}')
