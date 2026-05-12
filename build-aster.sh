@@ -18,9 +18,9 @@ do_sync() {
 
 do_runkernel() {
     if [ -e /dev/kvm ]; then
-        make ENABLE_KVM=1 run_kernel
+        make ENABLE_KVM=1 SMP=4 run_kernel
     else
-        make ENABLE_KVM=0 run_kernel
+        make ENABLE_KVM=0 SMP=4 run_kernel
     fi
 }
 
