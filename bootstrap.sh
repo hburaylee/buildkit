@@ -28,6 +28,9 @@ install_apt()
 
 install_rust()
 {
+    if [ -e $HOME/.cargo/bin/rustup ]; then
+        return 0
+    fi
     export RUSTUP_DIST_SERVER="https://rsproxy.cn"
     curl https://sh.rustup.rs -sSf | sh -s -- -y
 
@@ -45,6 +48,10 @@ install_delta()
     local insdir=/usr/local/bin
     local pkgname="delta"
     local release="0.18.2"
+
+    if command -v $pkgname >/dev/null 2>&1; then
+        return 0
+    fi
 
     [ ! -d $insdir ] && mkdir -p $insdir
 
@@ -94,6 +101,10 @@ install_bat()
     local pkgname="bat"
     local release="v0.26.1"
 
+    if command -v $pkgname >/dev/null 2>&1; then
+        return 0
+    fi
+
     [ ! -d $insdir ] && mkdir -p $insdir
 
     if [ ! -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ]; then
@@ -120,6 +131,10 @@ install_zellij()
     local insdir=/usr/local/bin
     local zellij_release="v0.44.0"
 
+    if command -v zellij >/dev/null 2>&1; then
+        return 0
+    fi
+
     [ ! -d $insdir ] && mkdir -p $insdir
 
     if [ ! -e zellij-x86_64-unknown-linux-musl.tar.gz ]; then
@@ -141,6 +156,10 @@ install_ripgrep()
     local pkgname="ripgrep"
     local release="15.1.0"
 
+    if command -v rg >/dev/null 2>&1; then
+        return 0
+    fi
+
     [ ! -d $insdir ] && mkdir -p $insdir
 
     if [ ! -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ]; then
@@ -161,6 +180,18 @@ install_vimll()
     pushd $gitdir
         [ ! -d $gitdir/vimll ] && git clone https://github.com/hbuxiaofei/vimll
         pushd $gitdir/vimll
+            bash install.sh
+        popd
+    popd
+}
+
+install_nvimll()
+{
+    local gitdir="$HOME/github"
+    [ ! -d $gitdir ] && mkdir -p $gitdir
+    pushd $gitdir
+        [ ! -d $gitdir/nvimll ] && git clone https://github.com/hbuxiaofei/nvimll
+        pushd $gitdir/nvimll
             bash install.sh
         popd
     popd
