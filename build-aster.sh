@@ -24,6 +24,14 @@ do_runkernel() {
     fi
 }
 
+do_gdbserver() {
+    if [ -e /dev/kvm ]; then
+        make ENABLE_KVM=1 SMP=4 gdb_server
+    else
+        make ENABLE_KVM=0 SMP=4 gdb_server
+    fi
+}
+
 if [ "$ws" != 1 ]; then
     mnt_dir="$PWD/$app"
     [ ! -d ${app} ] && git clone https://cnb.cool/rayylee/asterinas
@@ -32,6 +40,8 @@ fi
 if [ -n "$1" ]; then
     if [ "$1" == "run_kernel" ]; then
         do_runkernel
+    elif [ "$1" == "gdb_server" ]; then
+        do_gdbserver
     elif [ "$1" == "sync" ]; then
         pushd ${mnt_dir}
             do_sync
