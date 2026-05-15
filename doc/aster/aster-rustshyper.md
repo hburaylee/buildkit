@@ -110,7 +110,8 @@ rustshyper::init()                          [kernel/comps/rustshyper/src/lib.rs]
 VM FD ioctl: RSH_SET_USER_MEMORY_REGION
   └→ Vm::set_user_memory_region()
        ├→ 查询 host VmSpace 获取物理页帧
-       └→ 将 HPA 映射到 Guest GPA (通过 EPT)
+       └→ map_range()  将 HPA 映射到 Guest GPA (通过 EPT)
+            └→ map_4kb_page() 每次映射一个4k页面
 
 VM FD ioctl: RSH_CREATE_VCPU
   └→ Vcpu::new()
@@ -122,8 +123,8 @@ VCPU FD ioctl: RSH_RUN
   └→ Vcpu::run()                           [kernel/comps/rustshyper/src/vm.rs]
        │
        ├─ [首次运行] init()
-       │    ├→ VMCLEAR
-       │    ├→ VMPTRLD
+       │    ├→ VMCLEAR   ← 先清除VMCS状
+       │    ├→ VMPTRLD   ← 加载为当前VMCS，后续所有操作都是针对这个这个VMCS
        │    ├→ setup_vmcs_host()   ← 写入 host CR0/3/4, 段选择子, RIP→__rkvm_vm_exit_handler
        │    ├→ setup_vmcs_guest()  ← 写入 guest 寄存器状态, CR0/4 固定位清理
        │    └→ setup_vmcs_controls() ← pin/primary/secondary执行控制, 异常位图, EPTP
