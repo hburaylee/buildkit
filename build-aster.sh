@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 app="asterinas"
-docker_tag="0.17.2-20260407"
+docker_tag="0.17.2-20260508"
 
 ws="${WS:-1}"
 mnt_dir="/workspace"
@@ -14,6 +14,17 @@ do_sync() {
     git checkout main       # 或你使用的默认分支 (如 master)
     git merge github/main   # 合并GitHub 的更改
     git push origin main    # 推送到 GitLab
+}
+
+
+do_runnixos() {
+    if [ -e /dev/kvm ]; then
+        make nixos && \
+            make ENABLE_KVM=1 SMP=4 run_nixos
+    else
+        make nixos && \
+            make ENABLE_KVM=0 SMP=4 run_nixos
+    fi
 }
 
 do_runkernel() {
@@ -40,6 +51,8 @@ fi
 if [ -n "$1" ]; then
     if [ "$1" == "run_kernel" ]; then
         do_runkernel
+    elif [ "$1" == "run_nixos" ]; then
+        do_runnixos
     elif [ "$1" == "gdb_server" ]; then
         do_gdbserver
     elif [ "$1" == "sync" ]; then
