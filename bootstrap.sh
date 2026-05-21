@@ -175,6 +175,24 @@ install_ripgrep()
     [ -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
 }
 
+install_opencode()
+{
+    local insdir=/usr/local/bin
+    local pkgname="opencode"
+    local release="v1.15.6"
+
+    if command -v opencode >/dev/null 2>&1; then
+        return 0
+    fi
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+    if [ ! -e ${pkgname}-linux-x64.tar.gz ]; then
+        wget https://github.com/anomalyco/${pkgname}/releases/download/${release}/${pkgname}-linux-x64.tar.gz
+    fi
+    [ -e  ${pkgname}-linux-x64.tar.gz ] && tar -xf ${pkgname}-linux-x64.tar.gz -C ${insdir}/
+    [ -e  ${pkgname}-linux-x64.tar.gz ] && rm -f ${pkgname}-linux-x64.tar.gz
+}
+
 install_vimll()
 {
     local gitdir="$HOME/github"

@@ -12,8 +12,8 @@ do_sync() {
     git remote add github https://github.com/asterinas/asterinas
     git fetch github
     git checkout main       # 或你使用的默认分支 (如 master)
-    git merge github/main   # 合并GitHub 的更改
-    git push origin main    # 推送到 GitLab
+    # git merge github/main   # 合并GitHub 的更改
+    # git push origin main    # 推送到 GitLab
 }
 
 
