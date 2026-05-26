@@ -19,6 +19,10 @@ install_apt()
     apt install -y zstd
     apt install -y make
     apt install -y gcc
+    apt install -y flex
+    apt install -y bison
+    apt install -y bc
+    apt install -y libelf-dev
     apt install -y autoconf
     apt install -y git
     apt install -y iputils-ping
