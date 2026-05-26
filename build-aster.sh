@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 app="asterinas"
-docker_tag="0.17.2-20260508"
+docker_tag="0.17.2-20260523"
 
 ws="${WS:-1}"
 mnt_dir="/workspace"
