@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+cd $(dirname $0)
+
 app="asterinas"
 docker_tag="0.17.2-20260523"
 
-ws="${WS:-1}"
-mnt_dir="/workspace"
+cur_dir="$(pwd)"
+app_dir="$cur_dir/$app"
 
 echo ">>> build ${app}"
 
@@ -43,9 +45,10 @@ do_gdbserver() {
     fi
 }
 
-if [ "$ws" != 1 ]; then
-    mnt_dir="$PWD/$app"
-    [ ! -d ${app} ] && git clone https://cnb.cool/rayylee/asterinas
+if [ -e Cargo.toml ]; then
+    app_dir="$(pwd)"
+else
+    [ ! -d ${app} ] && git clone https://github.com/rayylee/asterinas
 fi
 
 if [ -n "$1" ]; then
@@ -56,20 +59,18 @@ if [ -n "$1" ]; then
     elif [ "$1" == "gdb_server" ]; then
         do_gdbserver
     elif [ "$1" == "sync" ]; then
-        pushd ${mnt_dir}
-            do_sync
-        popd
+        do_sync
     fi
     exit 0
 fi
 
-cp -f $0 ${mnt_dir}/
+[ ! -e Cargo.toml ] && cp -f $0 ${app_dir}/
 
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 "asterinas/asterinas" | awk '{print $1}')
 
 if [ -z "$docker_id" ]; then
     docker run -it --privileged --network=host \
-        -v /dev:/dev -v $mnt_dir:/root/asterinas  \
+        -v /dev:/dev -v $app_dir:/root/asterinas  \
         asterinas/asterinas:$docker_tag
 else
     is_exited="$(docker ps -a 2>/dev/null | grep -m 1 $docker_id | grep Exited)"
