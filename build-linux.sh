@@ -11,7 +11,7 @@ echo ">>> build ${app}"
 if [ -z "$WS" ]; then
     app_dir="$PWD/$app"
     if [ ! -d ${app} ]; then
-        git clone $repo
+        git clone --depth 1 $repo
     fi
 else
     app_dir="${ws_dir}/$app"
