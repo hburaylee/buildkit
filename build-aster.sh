@@ -66,7 +66,7 @@ fi
 
 [ ! -e Cargo.toml ] && cp -f $0 ${app_dir}/
 
-docker_id=$(docker ps -a 2>/dev/null | grep -m 1 "asterinas/asterinas" | grep -m 1 raylee-aster | awk '{print $1}')
+docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}')
 
 if [ -z "$docker_id" ]; then
     docker run --name raylee-aster -it --privileged --network=host \
