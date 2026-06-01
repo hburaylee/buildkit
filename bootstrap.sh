@@ -183,7 +183,7 @@ install_opencode()
 {
     local insdir=/usr/local/bin
     local pkgname="opencode"
-    local release="v1.15.6"
+    local release="v1.15.13"
 
     if command -v opencode >/dev/null 2>&1; then
         return 0
