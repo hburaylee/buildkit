@@ -64,6 +64,14 @@ if [ -n "$1" ]; then
     exit 0
 fi
 
+
+############ Enter pod ############
+
+if [ -e /root/ovmf ] && [ -e /.dockerenv ]; then
+    echo "Already in the pod..."
+    exit 0
+fi
+
 [ ! -e Cargo.toml ] && cp -f $0 ${app_dir}/
 
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}')
