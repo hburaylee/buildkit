@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Bootstrap start ..."
+
 # ====================== Install Functions ======================
 install_apt()
 {
