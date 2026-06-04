@@ -13,4 +13,4 @@ $:
       # 开发环境启动后会执行的任务
       stages:
         - name: stage-bootstrap
-          script: /bootstrap/bootstrap.sh all
+          script: /workspace/bootstrap.sh all
