@@ -34,6 +34,28 @@ install_apt()
     apt install -y clangd
 }
 
+setting_podman() {
+    cat > /etc/containers/registries.conf << EOF
+unqualified-search-registries = ["docker.io"]  # 默认还是搜docker.io
+# 重点! 把镜像源地址“附魔”到docker.io前缀上!
+[[registry]]
+prefix = "docker.io"
+location = "docker.m.daocloud.io"   # DaoCloud, 连接全世界
+[[registry]]
+prefix = "docker.io"
+location = "docker.1ms.run"       # 毫秒加速, YYDS
+[[registry]]
+prefix = "docker.io"
+location = "hub.rat.dev"          # 鼠鼠快车, 稳
+[[registry]]
+prefix = "docker.io"
+location = "docker.xuanyuan.me"   # 轩辕快递, 使命必达
+[[registry]]
+prefix = "docker.io"
+location = "docker.1panel.live"   # 1Panel专线, 官方认证
+EOF
+}
+
 install_rust()
 {
     if [ -e $HOME/.cargo/bin/rustup ]; then

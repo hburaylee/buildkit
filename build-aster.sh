@@ -3,7 +3,7 @@
 cd $(dirname $0)
 
 app="asterinas"
-docker_tag="0.17.2-20260523"
+docker_tag="0.18.0-20260603"
 
 cur_dir="$(pwd)"
 app_dir="$cur_dir/$app"
