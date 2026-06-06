@@ -221,6 +221,27 @@ install_opencode()
     [ -e  ${pkgname}-linux-x64.tar.gz ] && rm -f ${pkgname}-linux-x64.tar.gz
 }
 
+install_pandoc()
+{
+    local insdir=/usr/local/bin
+    local pkgname="pandoc"
+    local release="3.10"
+    local filename="${pkgname}-${release}-linux-amd64"
+
+    if command -v pandoc >/dev/null 2>&1; then
+        return 0
+    fi
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    if [ ! -e ${filename}.tar.gz ]; then
+        wget https://github.com/jgm/${pkgname}/releases/download/${release}/${filename}.tar.gz
+    fi
+
+    [ -e ${filename}.tar.gz ] && tar -xf ${filename}.tar.gz --strip-components=2 -C ${insdir}/ ${pkgname}-${release}/bin/
+    [ -e ${filename}.tar.gz ] && rm -f ${filename}.tar.gz
+}
+
 install_vimll()
 {
     local gitdir="$HOME/github"
