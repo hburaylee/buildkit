@@ -203,6 +203,47 @@ install_ripgrep()
     [ -e ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-${release}-x86_64-unknown-linux-musl.tar.gz
 }
 
+install_codex()
+{
+    local insdir=/usr/local/bin
+    local pkgname="codex"
+    local release="rust-v0.138.0"
+
+    [ ! -d $HOME/.codex ] && mkdir -p $HOME/.codex
+    cat > $HOME/.codex/config.toml << EOF
+[model_providers.aiping]
+name = "AIPing Responses API"
+base_url = "https://aiping.cn/api/v1"
+env_key = "AIPING_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+request_max_retries = 4
+stream_max_retries = 10
+stream_idle_timeout_ms = 300000
+EOF
+    cat > $HOME/.codex/aiping.config.toml << EOF
+model_provider = "aiping"
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+EOF
+
+    if command -v $pkgname >/dev/null 2>&1; then
+        return 0
+    fi
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    if [ ! -e ${pkgname}-x86_64-unknown-linux-musl.tar.gz ]; then
+        wget https://github.com/openai/${pkgname}/releases/download/${release}/${pkgname}-x86_64-unknown-linux-musl.tar.gz
+    fi
+    tar -xf ${pkgname}-x86_64-unknown-linux-musl.tar.gz
+    cp -f ${pkgname}-x86_64-unknown-linux-musl ${insdir}/${pkgname}
+    chmod a+x ${insdir}/${pkgname}
+    [ -e ${pkgname}-x86_64-unknown-linux-musl ] && rm -f ${pkgname}-x86_64-unknown-linux-musl
+    [ -e ${pkgname}-x86_64-unknown-linux-musl.tar.gz ] && rm -f ${pkgname}-x86_64-unknown-linux-musl.tar.gz
+}
+
 install_opencode()
 {
     local insdir=/usr/local/bin
