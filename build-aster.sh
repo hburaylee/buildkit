@@ -18,6 +18,10 @@ do_sync() {
     # git push origin main    # 推送到 GitLab
 }
 
+do_iso() {
+    make iso AUTO_INSTALL=false
+}
+
 
 do_runnixos() {
     if [ -e /dev/kvm ]; then
@@ -54,6 +58,8 @@ fi
 if [ -n "$1" ]; then
     if [ "$1" == "run_kernel" ]; then
         do_runkernel
+    elif [ "$1" == "run_iso" ]; then
+        do_iso
     elif [ "$1" == "run_nixos" ]; then
         do_runnixos
     elif [ "$1" == "gdb_server" ]; then
