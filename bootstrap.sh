@@ -32,6 +32,7 @@ install_apt()
     apt install -y tmux
     apt install -y universal-ctags
     apt install -y clangd
+    apt install -y bubblewrap
 }
 
 setting_podman() {
