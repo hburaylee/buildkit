@@ -58,7 +58,7 @@ fi
 if [ -n "$1" ]; then
     if [ "$1" == "run_kernel" ]; then
         do_runkernel
-    elif [ "$1" == "run_iso" ]; then
+    elif [ "$1" == "iso" ]; then
         do_iso
     elif [ "$1" == "run_nixos" ]; then
         do_runnixos
