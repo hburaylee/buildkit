@@ -61,6 +61,7 @@ EOF
 setting_claude() {
     npm install -g @anthropic-ai/claude-code
     [ ! -d $HOME/.claude ] && mkdir -p $HOME/.claude
+    # See https://aiping.cn/docs/UseCases/coding-assistant
     cat > $HOME/.claude/settings.json << EOF
 {
   "env": {
