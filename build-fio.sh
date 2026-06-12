@@ -14,7 +14,7 @@ fi
 
 if [ -d $app ]; then
     pushd $app
-    ./configure --build-static
+    ./configure --build-static --esx
     make -j$(nproc)
     popd
 fi
