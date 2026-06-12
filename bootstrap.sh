@@ -33,6 +33,7 @@ install_apt()
     apt install -y universal-ctags
     apt install -y clangd
     apt install -y bubblewrap
+    apt install -y npm
 }
 
 setting_podman() {
@@ -54,6 +55,26 @@ location = "docker.xuanyuan.me"   # 轩辕快递, 使命必达
 [[registry]]
 prefix = "docker.io"
 location = "docker.1panel.live"   # 1Panel专线, 官方认证
+EOF
+}
+
+setting_claude() {
+    npm install -g @anthropic-ai/claude-code
+    [ ! -d $HOME/.claude ] && mkdir -p $HOME/.claude
+    cat > $HOME/.claude/settings.json << EOF
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://aiping.cn/api/v1/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "<YOUR_API_KEY>",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+    "ANTHROPIC_MODEL": "Claude-Sonnet-4.6",
+    "ANTHROPIC_SMALL_FAST_MODEL": "Claude-Haiku-4.5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "Claude-Sonnet-4.6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "Claude-Opus-4.5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "Claude-Haiku-4.5"
+  }
+}
 EOF
 }
 
