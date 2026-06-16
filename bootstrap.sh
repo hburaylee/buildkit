@@ -230,7 +230,7 @@ install_codex()
 {
     local insdir=/usr/local/bin
     local pkgname="codex"
-    local release="rust-v0.138.0"
+    local release="rust-v0.140.0"
 
     [ ! -d $HOME/.codex ] && mkdir -p $HOME/.codex
     cat > $HOME/.codex/config.toml << EOF
