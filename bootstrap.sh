@@ -58,8 +58,61 @@ location = "docker.1panel.live"   # 1Panel专线, 官方认证
 EOF
 }
 
+install_skills()
+{
+    local gitdir="$HOME/github"
+    local repo_name="rust-skills"
+    [ ! -d $gitdir ] && mkdir -p $gitdir
+    pushd $gitdir
+        if [ ! -d $gitdir/$repo_name ]; then
+            git clone https://github.com/actionbook/rust-skills
+            pushd $gitdir/$repo_name
+                git reset --hard fa60f79
+            popd
+        fi
+    popd
+    local SKILLS=(
+        "m01-ownership"
+        "m02-resource"
+        "m03-mutability"
+        "m04-zero-cost"
+        "m05-type-driven"
+        "m06-error-handling"
+        "m07-concurrency"
+        "m10-performance"
+        "m14-mental-model"
+        "m15-anti-pattern"
+        "unsafe-checker"
+        "rust-symbol-analyzer"
+        "rust-call-graph"
+        "rust-code-navigator"
+        "rust-deps-visualizer"
+        "rust-refactor-helper"
+        "coding-guidelines"
+        "rust-learner"
+    )
+    local TARGET_DIR="$HOME/.claude/skills"
+    [ ! -d $TARGET_DIR ] && mkdir -p $TARGET_DIR
+    for skill in "${SKILLS[@]}"; do
+        SRC="$gitdir/$repo_name/skills/$skill"
+        DEST="$TARGET_DIR/$skill"
+        if [ -n "$skill" ]; then
+            if [ -d "$DEST" ]; then
+                rm -rf "$DEST"
+            fi
+            cp -r "$SRC" "$DEST"
+        fi
+    done
+}
+
 setting_claude() {
-    npm install -g @anthropic-ai/claude-code
+    apt update
+    if ! command -v npm >/dev/null 2>&1; then
+        apt install -y npm
+    fi
+    if ! command -v claude >/dev/null 2>&1; then
+        npm install -g @anthropic-ai/claude-code
+    fi
     [ ! -d $HOME/.claude ] && mkdir -p $HOME/.claude
     # See https://aiping.cn/docs/UseCases/coding-assistant
     cat > $HOME/.claude/settings.json << EOF
