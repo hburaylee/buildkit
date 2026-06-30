@@ -58,6 +58,18 @@ location = "docker.1panel.live"   # 1Panel专线, 官方认证
 EOF
 }
 
+get_github_release() {
+    local repo=$1
+    if command -v jq1 >/dev/null 2>&1; then
+        curl -sL "https://api.github.com/repos/${repo}/releases/latest" | jq -r .tag_name
+    else
+        curl -sL "https://api.github.com/repos/${repo}/releases/latest" \
+            | grep -o '"tag_name":[[:space:]]*"[^"]*"' \
+            | head -n 1 \
+            | sed -E 's/.*"tag_name":[[:space:]]*"([^"]+)".*/\1/'
+    fi
+}
+
 install_skills()
 {
     local gitdir="$HOME/github"
@@ -283,7 +295,8 @@ install_codex()
 {
     local insdir=/usr/local/bin
     local pkgname="codex"
-    local release="rust-v0.140.0"
+    local repo="openai/$pkgname"
+    local release="$(get_github_release $repo)"
 
     [ ! -d $HOME/.codex ] && mkdir -p $HOME/.codex
     cat > $HOME/.codex/config.toml << EOF
@@ -311,7 +324,7 @@ EOF
     [ ! -d $insdir ] && mkdir -p $insdir
 
     if [ ! -e ${pkgname}-x86_64-unknown-linux-musl.tar.gz ]; then
-        wget https://github.com/openai/${pkgname}/releases/download/${release}/${pkgname}-x86_64-unknown-linux-musl.tar.gz
+        wget https://github.com/${repo}/releases/download/${release}/${pkgname}-x86_64-unknown-linux-musl.tar.gz
     fi
     tar -xf ${pkgname}-x86_64-unknown-linux-musl.tar.gz
     cp -f ${pkgname}-x86_64-unknown-linux-musl ${insdir}/${pkgname}
@@ -324,7 +337,8 @@ install_opencode()
 {
     local insdir=/usr/local/bin
     local pkgname="opencode"
-    local release="v1.17.9"
+    local repo="anomalyco/$pkgname"
+    local release="$(get_github_release $repo)"
 
     if command -v opencode >/dev/null 2>&1; then
         return 0
@@ -332,7 +346,7 @@ install_opencode()
 
     [ ! -d $insdir ] && mkdir -p $insdir
     if [ ! -e ${pkgname}-linux-x64.tar.gz ]; then
-        wget https://github.com/anomalyco/${pkgname}/releases/download/${release}/${pkgname}-linux-x64.tar.gz
+        wget https://github.com/${repo}/releases/download/${release}/${pkgname}-linux-x64.tar.gz
     fi
     [ -e  ${pkgname}-linux-x64.tar.gz ] && tar -xf ${pkgname}-linux-x64.tar.gz -C ${insdir}/
     [ -e  ${pkgname}-linux-x64.tar.gz ] && rm -f ${pkgname}-linux-x64.tar.gz
