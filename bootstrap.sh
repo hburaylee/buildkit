@@ -17,6 +17,8 @@ install_apt()
     apt install -y libssl-dev
     apt install -y libncurses5-dev
     apt install -y libpcre2-dev
+    apt install -y libclang-dev
+    apt install -y libseccomp-dev
     apt install -y python3
     apt install -y zstd
     apt install -y make
