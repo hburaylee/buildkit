@@ -123,7 +123,7 @@ model_catalog_json = "$CODEX_HOME/model.json"
 
 [model_providers.my-ollama]
 name = "My Ollama"
-base_url = "http://127.0.0.1:11444/v1/"
+base_url = "http://localhost:11444/v1/"
 wire_api = "responses"
 EOF
     fi
