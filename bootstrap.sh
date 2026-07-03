@@ -62,7 +62,7 @@ EOF
 
 get_github_release() {
     local repo=$1
-    if command -v jq1 >/dev/null 2>&1; then
+    if command -v jq >/dev/null 2>&1; then
         curl -sL "https://api.github.com/repos/${repo}/releases/latest" | jq -r .tag_name
     else
         curl -sL "https://api.github.com/repos/${repo}/releases/latest" \
