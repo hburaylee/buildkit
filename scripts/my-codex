@@ -1,0 +1,173 @@
+
+#!/bin/bash
+
+#  # /etc/systemd/system/ollama.service
+#  [Unit]
+#  Description=Ollama Service
+#  After=network-online.target
+#
+#  [Service]
+#  ExecStartPre=/bin/bash -c 'mountpoint -q /root || mount /dev/nvme0n1 /root'
+#  ExecStart=/usr/local/bin/ollama serve
+#  User=root
+#  Group=root
+#  Restart=always
+#  RestartSec=3
+#  Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#
+#  Environment="OLLAMA_FLASH_ATTENTION=1"
+#  Environment="OLLAMA_CONTEXT_LENGTH=65536"
+#  # Environment="OLLAMA_KV_CACHE_TYPE=q8_0"
+#
+#  [Install]
+#  WantedBy=multi-user.target
+
+
+ARCH="$(uname -m)"
+IS_UPGRADE=0
+
+
+export CODEX_HOME="$HOME/.config/my-codex"
+export PATH="${CODEX_HOME}/bin:$PATH"
+
+[ ! -d ${CODEX_HOME} ] && mkdir -p ${CODEX_HOME}
+
+
+get_github_release()
+{
+    local repo=$1
+    if command -v jq >/dev/null 2>&1; then
+        curl -sL "https://api.github.com/repos/${repo}/releases/latest" | jq -r .tag_name
+    else
+        curl -sL "https://api.github.com/repos/${repo}/releases/latest" \
+            | grep -o '"tag_name":[[:space:]]*"[^"]*"' \
+            | head -n 1 \
+            | sed -E 's/.*"tag_name":[[:space:]]*"([^"]+)".*/\1/'
+    fi
+}
+
+__install_codex_pkg()
+{
+    local insdir=${CODEX_HOME}/bin
+    local binname="$1"
+    local pkgname="${binname}-${ARCH}-unknown-linux-musl"
+    local repo="openai/codex"
+    local release=""
+
+    if [ $IS_UPGRADE -eq 0 ]; then
+        [ -x $insdir/$binname ] && return 0
+    fi
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    release="$(get_github_release $repo)"
+    if [ ! -e ${pkgname}.tar.gz ]; then
+        wget https://github.com/${repo}/releases/download/${release}/${pkgname}.tar.gz
+    fi
+    tar -xf ${pkgname}.tar.gz
+    cp -f ${pkgname} ${insdir}/${binname}
+    chmod a+x ${insdir}/${binname}
+    [ -e ${pkgname} ] && rm -f ${pkgname}
+    [ -e ${pkgname}.tar.gz ] && rm -f ${pkgname}.tar.gz
+}
+
+__install_model_catalog()
+{
+    if [ $IS_UPGRADE -eq 0 ]; then
+        [ -e $CODEX_HOME/model.json ] && return 0
+    fi
+
+    cat > $CODEX_HOME/model.json << EOF
+{
+  "models": [
+    {
+      "base_instructions": "",
+      "context_window": 262144,
+      "default_verbosity": "low",
+      "display_name": "qwen3.6:35b",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text",
+        "image"
+      ],
+      "priority": 0,
+      "shell_type": "default",
+      "slug": "qwen3.6:35b",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "bytes"
+      },
+      "visibility": "list"
+    }
+  ]
+}
+EOF
+}
+
+__install_config_file()
+{
+    if [ $IS_UPGRADE -eq 0 ]; then
+        [ -e $CODEX_HOME/my-ollama.config.toml ] && return 0
+    fi
+
+    if [ ! -e $CODEX_HOME/my-ollama.config.toml ]; then
+        cat > $CODEX_HOME/my-ollama.config.toml << EOF
+model = "qwen3.6:35b"
+model_provider = "my-ollama"
+model_catalog_json = "$CODEX_HOME/model.json"
+
+[model_providers.my-ollama]
+name = "My Ollama"
+base_url = "http://127.0.0.1:11434/v1/"
+wire_api = "responses"
+EOF
+    fi
+}
+
+do_install()
+{
+    __install_codex_pkg codex
+    __install_codex_pkg bwrap
+
+    __install_model_catalog
+    __install_config_file
+}
+
+parse_args()
+{
+    case "$1" in
+        install)
+            do_install
+            ;;
+        upgrade)
+            IS_UPGRADE=1
+            do_install
+            ;;
+        help|--help|-h)
+            echo "Usage: $0 [install|upgrade|help] "
+            echo "  install   Install the application"
+            echo "  upgrade   Upgrade to the latest version"
+            echo "  help      Display this help message"
+            ;;
+        *)
+            echo "Unknown Command: $1"
+            echo "Run '$0 help' for usage information"
+            exit 1
+            ;;
+    esac
+}
+
+if [ -n "$1" ]; then
+    parse_args
+    exit 0
+fi
+
+
+codex -p my-ollama
+
+exit 0
