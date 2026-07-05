@@ -23,6 +23,7 @@
 #  WantedBy=multi-user.target
 
 
+SCRIPT_PATH="$(readlink -f $0)"
 ARCH="$(uname -m)"
 IS_UPGRADE=0
 
@@ -73,7 +74,11 @@ __install_codex_pkg()
 
 __install_model_catalog()
 {
-    if [ $IS_UPGRADE -eq 0 ]; then
+    local force=0
+    if [ $# -ne 2 ] && [ $2 == "--config" ] ; then
+        force=1
+    fi
+    if [ $force -eq 0 ] && [ $IS_UPGRADE -eq 0 ]; then
         [ -e $CODEX_HOME/model.json ] && return 0
     fi
 
@@ -134,11 +139,15 @@ EOF
 
 __install_config_file()
 {
-    if [ $IS_UPGRADE -eq 0 ]; then
+    local force=0
+    if [ $# -ne 2 ] && [ $2 == "--config" ] ; then
+        force=1
+    fi
+    if [ $force -eq 0 ] && [ $IS_UPGRADE -eq 0 ]; then
         [ -e $CODEX_HOME/my-ollama.config.toml ] && return 0
     fi
 
-    if [ ! -e $CODEX_HOME/my-ollama.config.toml ]; then
+    if [ $force == 1 ] || [ ! -e $CODEX_HOME/my-ollama.config.toml ]; then
         cat > $CODEX_HOME/my-ollama.config.toml << EOF
 # model = "qwen3.6:35b"
 model = "ornith:35b"
@@ -158,19 +167,22 @@ do_install()
     __install_codex_pkg codex
     __install_codex_pkg bwrap
 
-    __install_model_catalog
-    __install_config_file
+    __install_model_catalog $@
+    __install_config_file $@
+
+    cp -f $SCRIPT_PATH /usr/local/bin/my-codex
+    chmod +x /usr/local/bin/my-codex
 }
 
 parse_args()
 {
     case "$1" in
         install)
-            do_install
+            do_install $@
             ;;
         upgrade)
             IS_UPGRADE=1
-            do_install
+            do_install $@
             ;;
         help|--help|-h)
             echo "Usage: $0 [install|upgrade|help] "
@@ -179,9 +191,6 @@ parse_args()
             echo "  help      Display this help message"
             ;;
         *)
-            echo "Unknown Command: $1"
-            echo "Run '$0 help' for usage information"
-            exit 1
             ;;
     esac
 }
@@ -192,6 +201,6 @@ if [ -n "$1" ]; then
 fi
 
 
-codex -p my-ollama
+codex -p my-ollama @$
 
 exit 0
