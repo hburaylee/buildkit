@@ -16,7 +16,7 @@
 #  Environment="OLLAMA_HOST=0.0.0.0:11444"
 #
 #  Environment="OLLAMA_FLASH_ATTENTION=1"
-#  Environment="OLLAMA_CONTEXT_LENGTH=65536"
+#  Environment="OLLAMA_CONTEXT_LENGTH=131072"
 #  # Environment="OLLAMA_KV_CACHE_TYPE=q8_0"
 #
 #  [Install]
@@ -103,6 +103,29 @@ __install_model_catalog()
         "mode": "bytes"
       },
       "visibility": "list"
+    },
+    {
+      "base_instructions": "",
+      "context_window": 262144,
+      "default_verbosity": "low",
+      "display_name": "ornith:35b",
+      "experimental_supported_tools": [],
+      "input_modalities": [
+        "text"
+      ],
+      "priority": 0,
+      "shell_type": "default",
+      "slug": "ornith:35b",
+      "support_verbosity": true,
+      "supported_in_api": true,
+      "supported_reasoning_levels": [],
+      "supports_parallel_tool_calls": false,
+      "supports_reasoning_summaries": false,
+      "truncation_policy": {
+        "limit": 10000,
+        "mode": "bytes"
+      },
+      "visibility": "list"
     }
   ]
 }
@@ -117,7 +140,8 @@ __install_config_file()
 
     if [ ! -e $CODEX_HOME/my-ollama.config.toml ]; then
         cat > $CODEX_HOME/my-ollama.config.toml << EOF
-model = "qwen3.6:35b"
+# model = "qwen3.6:35b"
+model = "ornith:35b"
 model_provider = "my-ollama"
 model_catalog_json = "$CODEX_HOME/model.json"
 
