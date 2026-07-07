@@ -117,6 +117,10 @@ install_skills()
             cp -r "$SRC" "$DEST"
         fi
     done
+    SRC="doc/aster/aster-code-write"
+    DEST="$TARGET_DIR/aster-code-write"
+    [ -d "$DEST" ] && rm -rf "$DEST"
+    cp -r "$SRC" "$DEST"
 }
 
 setting_claude() {
