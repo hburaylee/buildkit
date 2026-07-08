@@ -21,8 +21,9 @@ security, maintainability, hardware, and documentation concerns from the start.
 - `--output <path>` — where to write the design rationale.
   Default: `<spec-file>.rationale.md`.
 - `--guidelines <path>` — path to a directory of persona-keyed coding guidelines.
+  Default: `coding-guidelines` (the `coding-guidelines` subdirectory of this skill).
   When provided, the skill reads project-specific rules from it.
-  When omitted, it uses its built-in persona checklists only.
+  When omitted, it falls back to this default directory.
 
 ## Pipeline
 
@@ -56,6 +57,7 @@ Each pass receives:
 - The task spec
 - That persona's file from this skill's `personas/` directory
 - If `--guidelines` is given, the matching guideline file from that directory
+  (defaults to `coding-guidelines` when the flag is omitted)
 - Any relevant existing code for context
 
 Each pass returns a structured constraint document
