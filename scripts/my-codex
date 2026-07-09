@@ -75,7 +75,7 @@ __install_codex_pkg()
 __install_model_catalog()
 {
     local force=0
-    if [ $# -ne 2 ] && [ $2 == "--config" ] ; then
+    if [ $# -ne 2 ] && [ $2 = "--config" ] ; then
         force=1
     fi
     if [ $force -eq 0 ] && [ $IS_UPGRADE -eq 0 ]; then
@@ -140,7 +140,7 @@ EOF
 __install_config_file()
 {
     local force=0
-    if [ $# -ne 2 ] && [ $2 == "--config" ] ; then
+    if [ $# -ne 2 ] && [ $2 = "--config" ] ; then
         force=1
     fi
     if [ $force -eq 0 ] && [ $IS_UPGRADE -eq 0 ]; then
@@ -170,7 +170,7 @@ do_install()
     __install_model_catalog $@
     __install_config_file $@
 
-    cp -f $SCRIPT_PATH /usr/local/bin/my-codex
+    cp -f $SCRIPT_PATH /usr/local/bin/my-codex 2>/dev/null || :
     chmod +x /usr/local/bin/my-codex
 }
 
