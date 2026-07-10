@@ -350,6 +350,31 @@ install_opencode()
         return 0
     fi
 
+    if [ ! -d ~/.config/opencode ]; then
+        mkdir -p ~/.config/opencode
+    fi
+    cat > ~/.config/opencode/opencode.json << EOF
+{
+  "\$schema": "https://opencode.ai/config.json",
+  "lsp": true,
+  "provider": {
+    "myprovider": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "My AI Provider",
+      "options": {
+        "baseURL": "{env:MY_API_URL}",
+	"apiKey": "{env:MY_API_KEY}"
+      },
+      "models": {
+        "deepseek-v4-flash": {
+          "name": "deepseek-v4-flash"
+        }
+      }
+    }
+  }
+}
+EOF
+
     [ ! -d $insdir ] && mkdir -p $insdir
     if [ ! -e ${pkgname}-linux-x64.tar.gz ]; then
         wget https://github.com/${repo}/releases/download/${release}/${pkgname}-linux-x64.tar.gz
