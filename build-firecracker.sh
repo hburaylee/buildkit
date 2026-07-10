@@ -14,8 +14,9 @@ show_vmlinux_rootfs() {
 
 === Test ===
 
-=> https://s3.amazonaws.com/spec.ccfc.min/
+=> [Web browser] http://spec.ccfc.min.s3.amazonaws.com/?prefix=firecracker-ci
 
+=> wget https://s3.amazonaws.com/spec.ccfc.min/
 EOF
 
     curl -s "https://s3.amazonaws.com/spec.ccfc.min/?list-type=2&prefix=firecracker-ci/v1.10/${ARCH}/vmlinux-" \
@@ -26,7 +27,6 @@ EOF
     curl -s "https://s3.amazonaws.com/spec.ccfc.min/?list-type=2&prefix=firecracker-ci/v1.10/${ARCH}/ubuntu-" \
         | grep -oP '(?<=<Key>)firecracker-ci/v1\.10/'"${ARCH}"'/ubuntu-[0-9.]+\.(squashfss|ext4)(?=</Key>)' \
         | sort -V | tail -1
-
 
     cat << EOF
 
