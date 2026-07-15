@@ -201,6 +201,6 @@ if [ -n "$1" ]; then
 fi
 
 
-codex -p my-ollama @$
+codex -p my-ollama $@
 
 exit 0
