@@ -136,6 +136,8 @@ setting_claude() {
     cat > $HOME/.claude/settings.json << EOF
 {
   "env": {
+    "DISABLE_UPDATES": "1",
+    "DISABLE_AUTOUPDATER": "1",
     "ANTHROPIC_BASE_URL": "https://aiping.cn/api/v1/anthropic",
     "ANTHROPIC_AUTH_TOKEN": "<YOUR_API_KEY>",
     "API_TIMEOUT_MS": "3000000",
