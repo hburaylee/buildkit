@@ -430,6 +430,28 @@ install_nvimll()
     popd
 }
 
+install_grok()
+{
+    local insdir=/usr/local/bin
+
+    if command -v grok >/dev/null 2>&1; then
+        return 0
+    fi
+
+    [ ! -d $insdir ] && mkdir -p $insdir
+
+    # https://docs.x.ai/build/overview
+    # https://x.ai/cli/install.sh
+    local GROK_RELEASE
+    GROK_RELEASE=$(curl -fsSL https://storage.googleapis.com/grok-build-public-artifacts/cli/stable)
+
+    curl -fsSL \
+        https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-${GROK_RELEASE}-linux-x86_64 \
+        -o ${insdir}/grok
+
+    chmod +x ${insdir}/grok
+}
+
 # ====================== Help Information ======================
 all_available()
 {
