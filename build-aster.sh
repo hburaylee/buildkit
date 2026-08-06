@@ -3,7 +3,8 @@
 cd $(dirname $0)
 
 app="asterinas"
-docker_tag="0.18.0-20260702"
+docker_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/asterinas/asterinas/tags?page_size=100" 2>/dev/null | \
+    jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
 
 cur_dir="$(pwd)"
 app_dir="$cur_dir/$app"
