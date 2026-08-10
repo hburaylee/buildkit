@@ -438,6 +438,20 @@ install_grok()
         return 0
     fi
 
+    [ ! -d $HOME/.grok ] && mkdir -p $HOME/.grok
+    # See https://docs.x.ai/build/overview
+    cat > $HOME/.grok/config.toml << EOF
+[model.deepseek]
+model = "deepseek-v4-flash"
+base_url = "https://api.deepseek.com/v1"
+name = "deepseek-v4-flash"
+env_key = "DEEPSEEK_API_KEY"
+api_backend = "chat_completions" # chat_completions | responses | messages
+
+[models]
+default = "deepseek"
+EOF
+
     [ ! -d $insdir ] && mkdir -p $insdir
 
     # https://docs.x.ai/build/overview
