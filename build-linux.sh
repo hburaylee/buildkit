@@ -33,7 +33,7 @@ fi
 do_clone
 pushd ${app_dir}
     [ ! -e .config ] && make defconfig
-    make -j $(nproc) compile_commands.json
+    # make -j $(nproc) compile_commands.json
 popd
 
 exit 0
