@@ -84,8 +84,12 @@ fi
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}')
 
 if [ -z "$docker_id" ]; then
+    DOCKER_ARGS=(
+        -v /sys:/sys:ro
+    )
+    [ -e /dev/kvm ] && DOCKER_ARGS+=(-v /dev:/dev)
     docker run --name raylee-aster -it --privileged --network=host \
-        -v /dev:/dev -v $app_dir:/root/asterinas  \
+        ${DOCKER_ARGS[@]} -v $app_dir:/root/asterinas \
         asterinas/kernel-dev:$docker_tag
 else
     is_exited="$(docker ps -a 2>/dev/null | grep -m 1 $docker_id | grep Exited)"
