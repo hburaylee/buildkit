@@ -3,7 +3,7 @@
 cd $(dirname $0)
 
 app="asterinas"
-docker_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/asterinas/asterinas/tags?page_size=100" 2>/dev/null | \
+docker_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/asterinas/kernel-dev/tags?page_size=100" 2>/dev/null | \
     jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
 
 cur_dir="$(pwd)"
@@ -86,7 +86,7 @@ docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}'
 if [ -z "$docker_id" ]; then
     docker run --name raylee-aster -it --privileged --network=host \
         -v /dev:/dev -v $app_dir:/root/asterinas  \
-        asterinas/asterinas:$docker_tag
+        asterinas/kernel-dev:$docker_tag
 else
     is_exited="$(docker ps -a 2>/dev/null | grep -m 1 $docker_id | grep Exited)"
     if [ -n "$is_exited" ]; then
