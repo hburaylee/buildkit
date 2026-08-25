@@ -65,10 +65,14 @@ do_clone() {
     fi
 }
 
+do_build() {
+    pushd ${app_dir} > /dev/null
+        cargo build && file ./build/cargo_target/debug/firecracker
+        show_vmlinux_rootfs
+    popd > /dev/null
+}
+
 do_clone
-pushd ${app_dir} > /dev/null
-    cargo build && file ./build/cargo_target/debug/firecracker
-    show_vmlinux_rootfs
-popd > /dev/null
+# do_build
 
 exit 0
