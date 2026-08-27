@@ -76,6 +76,7 @@ if [ -n "$1" ]; then
     if [ "$1" == "download" ]; then
        do_clone
     fi
+    exit 0
 fi
 
 

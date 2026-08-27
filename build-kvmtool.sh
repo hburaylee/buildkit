@@ -18,15 +18,20 @@ do_sync() {
     git push origin main    # 推送到 GitLab
 }
 
-[ ! -d ${app} ] && git clone $repo
+do_download() {
+    [ ! -d ${app} ] && git clone $repo
+}
 
 if [ -n "$1" ]; then
     if [ "$1" == "sync" ]; then
         do_sync
+    elif [ "$1" == "download" ]; then
+        do_download
     fi
     exit 0
 fi
 
+do_download
 pushd $app
     make -j $(nproc) lkvm-static
 popd
