@@ -25,7 +25,14 @@ do_build() {
 }
 
 
+if [ -n "$1" ]; then
+    if [ "$1" == "download" ]; then
+       do_clone
+    fi
+fi
+
+
 do_clone
-# do_build
+do_build
 
 exit 0

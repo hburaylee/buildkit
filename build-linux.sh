@@ -24,16 +24,19 @@ do_upstream() {
 }
 
 if [ -n "$1" ]; then
-    if [ "$1" == "upstream" ]; then
+    if [ "$1" == "download" ]; then
+        do_clone
+    elif [ "$1" == "upstream" ]; then
         do_upstream
     fi
     exit 0
 fi
 
+
 do_clone
 pushd ${app_dir}
     [ ! -e .config ] && make defconfig
-    # make -j $(nproc) compile_commands.json
+    make -j $(nproc) compile_commands.json
 popd
 
 exit 0
