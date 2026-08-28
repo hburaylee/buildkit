@@ -3,8 +3,6 @@
 cd $(dirname $0)
 
 app="asterinas"
-docker_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/asterinas/kernel-dev/tags?page_size=100" 2>/dev/null | \
-    jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
 
 cur_dir="$(pwd)"
 app_dir="$cur_dir/$app"
@@ -84,6 +82,13 @@ fi
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}')
 
 if [ -z "$docker_id" ]; then
+    docker_tag=$(curl -s -m 10 "https://registry.hub.docker.com/v2/repositories/asterinas/kernel-dev/tags?page_size=100" 2>/dev/null | \
+        jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
+    [ -z "$docker_tag" ] && \
+        docker_tag=$(curl -sL -m 10 https://raw.githubusercontent.com/asterinas/asterinas/main/DOCKER_IMAGE_VERSION 2>/dev/null | tail -n 1)
+    [ -z "$docker_tag" ] && \
+        docker_tag=$(curl -sL -m 10 https://cdn.jsdelivr.net/gh/asterinas/asterinas@main/DOCKER_IMAGE_VERSION 2>/dev/null | tail -n 1)
+
     DOCKER_ARGS=(
         -v /sys:/sys:ro
     )
