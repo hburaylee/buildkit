@@ -92,9 +92,10 @@ if [ -z "$docker_id" ]; then
     DOCKER_ARGS=(
         -v /sys:/sys:ro
     )
+    parent_dir=$(dirname "$app_dir")
     [ -e /dev/kvm ] && DOCKER_ARGS+=(-v /dev:/dev)
     docker run --name raylee-aster -it --privileged --network=host \
-        ${DOCKER_ARGS[@]} -v $app_dir:/root/asterinas \
+        ${DOCKER_ARGS[@]} -v $app_dir:/root/asterinas -v $parent_dir:/root/workdir \
         asterinas/kernel-dev:$docker_tag
 else
     is_exited="$(docker ps -a 2>/dev/null | grep -m 1 $docker_id | grep Exited)"
