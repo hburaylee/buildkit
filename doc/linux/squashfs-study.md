@@ -346,7 +346,7 @@ export_table[inode_number-1] ─────────► Inode Table（NFS �
 ---
 ---
 
-# Linux 内核 Squashfs 实现分析
+# Linux v7.0 内核 Squashfs 实现分析
 
 > 基于本仓库 `fs/squashfs/` 源码（Squashfs 4.0，约 6600 行）的分析。
 
@@ -477,30 +477,41 @@ superblock(60B) → [压缩选项] → 数据块 + fragment 块 ……
 init_squashfs_fs                       [模块初始化, super.c]
 └── register_filesystem(squashfs_fs_type)
 
-mount(2)
-└── squashfs_init_fs_context
-    └── squashfs_get_tree
-        └── get_tree_bdev(fc, squashfs_fill_super)
-            └── squashfs_fill_super                [super.c]
-                ├── sb_min_blocksize
-                ├── squashfs_read_table            // 读 60B 超级块
-                ├── supported_squashfs_filesystem
-                │   └── squashfs_lookup_decompressor
-                ├── squashfs_cache_init            // "metadata" 8 x 8KiB
-                ├── squashfs_cache_init            // "data" read_page (FILE_CACHE 时)
-                ├── squashfs_decompressor_setup    [decompressor.c]
-                │   ├── get_comp_opts
-                │   │   └── squashfs_read_data     // 读压缩参数块(可选)
-                │   └── thread_ops->create         // single/multi/percpu
-                │       └── decompressor->init     // 如 zstd_init, 分配 workspace
-                ├── squashfs_cache_init            // "fragment" 3 x block_size
-                ├── squashfs_read_xattr_id_table
-                ├── squashfs_read_id_index_table   ─┐
-                ├── squashfs_read_inode_lookup_table ├─ 都经 squashfs_read_table
-                ├── squashfs_read_fragment_index_table┘  (二级索引常驻内存)
-                ├── new_inode
-                ├── squashfs_read_inode(root)      // 见下面第 3 节
-                └── d_make_root
+SYSCALL_DEFINE5(mount, ...)                            [fs/namespace.c:4338]
+└── do_mount                                           [fs/namespace.c:4163]
+    └── path_mount                                     [fs/namespace.c:4084]
+        └── do_new_mount                               [fs/namespace.c:3792]
+            ├── get_fs_type("squashfs")                [fs/filesystems.c:274]
+            ├── fc = fs_context_for_mount              [fs/fs_context.c:306]
+            │   └── alloc_fs_context                   [fs/fs_context.c:258]
+            │       └── squashfs_init_fs_context(*fc)  [fs/squashfs/super.c:550]
+            │           ├── fc->fs_private = opts
+            │           └── fc->ops = &squashfs_context_ops
+            └── do_new_mount_fc(fc)                    [fs/namespace.c:3759]
+                └── fc_mount                           [fs/namespace.c:1191]
+                    └── vfs_get_tree                   [fs/super.c:1743]
+                        └── squashfs_get_tree          [fs/squashfs/super.c:494]
+                            └── get_tree_bdev(fc, squashfs_fill_super)
+                                └── squashfs_fill_super   [fs/squashfs/super.c:180]
+                                    ├── sb_min_blocksize
+                                    ├── squashfs_read_table            // 读 96B squashfs_super_block
+                                    ├── supported_squashfs_filesystem
+                                    │   └── squashfs_lookup_decompressor
+                                    ├── squashfs_cache_init            // "metadata" 8 x 8KiB
+                                    ├── squashfs_cache_init            // "data" read_page (FILE_CACHE 时)
+                                    ├── squashfs_decompressor_setup    [fs/squashfs/decompressor.c]
+                                    │   ├── get_comp_opts
+                                    │   │   └── squashfs_read_data     // 读压缩参数块(可选)
+                                    │   └── thread_ops->create         // single/multi/percpu
+                                    │       └── decompressor->init     // 如 zstd_init, 分配 workspace
+                                    ├── squashfs_read_xattr_id_table                                         ─┐
+                                    ├── squashfs_read_id_index_table                                         ─┤
+                                    ├── squashfs_read_inode_lookup_table                                     ─┤ 都经 squashfs_read_table
+                                    ├── squashfs_cache_init // "fragment" 3 x block_size (fragments != 0 时)  │
+                                    ├── squashfs_read_fragment_index_table // 二级索引常驻内存               ─┘
+                                    ├── root = new_inode(sb)
+                                    ├── squashfs_read_inode(root, root_ino)
+                                    └── d_make_root(root)
 ```
 
 ### 2. 路径查找 `squashfs_lookup`（namei.c）
