@@ -534,7 +534,7 @@ SYSCALL_DEFINE5(statx, ...)                               [fs/stat.c:804]
                     └── walk_component                // 最后一级, 同样经 lookup_fast/lookup_slow
 
 squashfs_lookup(dir, dentry, flags)                       [fs/squashfs/namei.c:120]
-├── get_dir_index_using_name                          // 扫目录索引, 定位元数据块
+├── get_dir_index_using_name(dentry->d_name.name)     // 扫目录索引, 定位元数据块
 │   └── squashfs_read_metadata ×2                     // 每项: dir_index + name
 ├── while (length < i_size_read(dir))                 // 扫目录条目
 │   ├── squashfs_read_metadata(&dirh)                 // squashfs_dir_header
@@ -589,46 +589,49 @@ squashfs_read_metadata(sb, buffer, &block, &offset, length)
 ### 5. 文件数据读取（file.c）
 
 ```text
-read(2)
-└── generic_file_read_iter
-    └── filemap_read → page cache 未命中
-        ├── squashfs_readahead               [a_ops.readahead]
-        │   ├── readahead_expand             // 对齐到 block_size 边界
-        │   ├── [末块且有 fragment] squashfs_readahead_fragment
-        │   │   ├── squashfs_get_fragment    //   → squashfs_cache_get(fragment_cache)
-        │   │   └── squashfs_copy_data → 逐页填充
-        │   └── [普通块]
-        │       ├── read_blocklist           // 见下
-        │       ├── squashfs_page_actor_init_special
-        │       └── squashfs_read_data       // 解压直接进 page cache
-        │
-        └── squashfs_read_folio              [a_ops.read_folio]
-            ├── read_blocklist(inode, index)
-            │   └── read_blocklist_ptrs
-            │       ├── fill_meta_index      // 大文件索引缓存(8 槽 x 127 项)
-            │       │   ├── calculate_skip
-            │       │   ├── locate_meta_index / empty_meta_index
-            │       │   └── read_indexes     // 累加 block_list
-            │       │       └── squashfs_read_metadata
-            │       └── squashfs_read_metadata   // 读目标块的压缩大小
-            │
-            ├── [size==0 稀疏块] squashfs_readpage_sparse
-            │   └── squashfs_copy_cache(folio, buffer=NULL)   // 清零
-            │
-            ├── [普通数据块] squashfs_readpage_block   // 二选一实现
-            │   ├── file_direct.c:
-            │   │   ├── grab_cache_page_nowait ×N      // 抓齐该块覆盖的页
-            │   │   ├── squashfs_page_actor_init_special
-            │   │   ├── squashfs_read_data             // 直接解压进 page cache
-            │   │   └── SetPageUptodate ×N + unlock_page ×N
-            │   └── file_cache.c:
-            │       ├── squashfs_get_datablock         // read_page 缓存
-            │       │   └── squashfs_cache_get → squashfs_read_data
-            │       └── squashfs_copy_cache            // memcpy 进 page cache
-            │
-            └── [文件尾块在 fragment 中] squashfs_readpage_fragment
-                ├── squashfs_get_fragment
-                └── squashfs_copy_cache(folio, buffer, fragment_offset)
+SYSCALL_DEFINE3(read, ...)                                [fs/read_write.c:724]
+└── ksys_read                                             [fs/read_write.c:706]
+    └── vfs_read                                          [fs/read_write.c:554]
+        └── new_sync_read                                 [fs/read_write.c:483]  // file->f_op->read_iter
+            └── generic_file_read_iter                    [mm/filemap.c:2956]    // squashfs_file_operations.read_iter
+                └── filemap_read                          [mm/filemap.c:2768]
+                    └── filemap_get_pages                 [mm/filemap.c:2667]    // page cache 未命中时
+                        ├── page_cache_sync_ra            [mm/readahead.c:557]
+                        │   └── read_pages                [mm/readahead.c:149]
+                        │       └── squashfs_readahead    [fs/squashfs/file.c:574]   // a_ops.readahead
+                        │           ├── readahead_expand                 // 对齐到 block_size 边界
+                        │           ├── [末块且有 fragment] squashfs_readahead_fragment   [file.c:505]
+                        │           │   ├── squashfs_get_fragment        // → squashfs_cache_get(fragment_cache)
+                        │           │   └── squashfs_copy_data           // 逐页填充
+                        │           └── [普通块]
+                        │               ├── read_blocklist               // 见下
+                        │               ├── squashfs_page_actor_init_special
+                        │               └── squashfs_read_data           // 解压直接进 page cache
+                        └── filemap_create_folio           [mm/filemap.c:2600]    // readahead 之后仍未命中
+                            └── squashfs_read_folio        [fs/squashfs/file.c:462]   // a_ops.read_folio
+                                ├── read_blocklist(inode, index)   [file.c:366]
+                                │   └── read_blocklist_ptrs        [file.c:329]
+                                │       ├── fill_meta_index         // 大文件索引缓存(8 槽 x 127 项)   [file.c:229]
+                                │       │   ├── calculate_skip
+                                │       │   ├── locate_meta_index / empty_meta_index
+                                │       │   └── read_indexes        // 累加 block_list
+                                │       │       └── squashfs_read_metadata
+                                │       └── squashfs_read_metadata  // 读目标块的压缩大小
+                                ├── [size==0 稀疏块] squashfs_readpage_sparse   [file.c:456]
+                                │   └── squashfs_copy_cache(folio, buffer=NULL) // 清零
+                                ├── [普通数据块] squashfs_readpage_block  [file.c:491]  // 二选一实现
+                                │   ├── file_direct.c:   [file_direct.c:22]
+                                │   │   ├── grab_cache_page_nowait ×N    // 抓齐该块覆盖的页
+                                │   │   ├── squashfs_page_actor_init_special
+                                │   │   ├── squashfs_read_data           // 直接解压进 page cache
+                                │   │   └── SetPageUptodate ×N + unlock_page ×N
+                                │   └── file_cache.c:    [file_cache.c:21]
+                                │       ├── squashfs_get_datablock       // read_page 缓存
+                                │       │   └── squashfs_cache_get → squashfs_read_data
+                                │       └── squashfs_copy_cache          // memcpy 进 page cache
+                                └── [文件尾块在 fragment 中] squashfs_readpage_fragment   [file.c:436]
+                                    ├── squashfs_get_fragment
+                                    └── squashfs_copy_cache(folio, buffer, fragment_offset)
 ```
 
 ### 6. 读盘 + 解压总入口 `squashfs_read_data`（block.c）
