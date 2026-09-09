@@ -517,37 +517,56 @@ SYSCALL_DEFINE5(mount, ...)                            [fs/namespace.c:4338]
 ### 2. 路径查找 `squashfs_lookup`（namei.c）
 
 ```text
-vfs lookup
-└── squashfs_lookup                          [i_op.lookup, namei.c]
-    ├── get_dir_index_using_name             // 用名字扫目录索引, 定位元数据块
-    │   └── squashfs_read_metadata ×2        //   每项: dir_index + name
-    ├── while (length < i_size) {            // 扫描目录条目
-    │   ├── squashfs_read_metadata(&dirh)    //   squashfs_dir_header
-    │   ├── squashfs_read_metadata(dire)     //   squashfs_dir_entry
-    │   └── squashfs_read_metadata(dire->name)
-    │ }
-    ├── [命中] squashfs_iget(dirh.start_block, dire.offset)   // 见第 3 节
-    └── d_splice_alias
+SYSCALL_DEFINE5(statx, ...)                               [fs/stat.c:804]
+└── do_statx                                              [fs/stat.c:744]
+    └── vfs_statx                                         [fs/stat.c:341]
+        └── filename_lookup                               [fs/namei.c:2831]
+            └── path_lookupat                             [fs/namei.c:2798]
+                ├── path_init                             [fs/namei.c:2671]
+                ├── link_path_walk                        [fs/namei.c:2575]
+                │   └── walk_component                    [fs/namei.c:2262]   // 非最后一级
+                │       ├── lookup_fast                   [fs/namei.c:1839]
+                │       └── lookup_slow                   [fs/namei.c:1926]
+                │           └── __lookup_slow             [fs/namei.c:1889]
+                │               └── dir->d_inode->i_op->lookup(inode, dentry, flags)
+                │                   └── squashfs_lookup   [fs/squashfs/namei.c:120]
+                └── lookup_last                           [fs/namei.c:2779]
+                    └── walk_component                // 最后一级, 同样经 lookup_fast/lookup_slow
+
+squashfs_lookup(dir, dentry, flags)                       [fs/squashfs/namei.c:120]
+├── get_dir_index_using_name                          // 扫目录索引, 定位元数据块
+│   └── squashfs_read_metadata ×2                     // 每项: dir_index + name
+├── while (length < i_size_read(dir))                 // 扫目录条目
+│   ├── squashfs_read_metadata(&dirh)                 // squashfs_dir_header
+│   └── while (dir_count--)
+│       ├── squashfs_read_metadata(dire)              // squashfs_dir_entry
+│       ├── squashfs_read_metadata(dire->name)
+│       └── squashfs_iget(sb, SQUASHFS_MKINODE(blk, off), ino_num)   // [名字命中] 见第 3 节
+└── d_splice_alias(inode, dentry)
 ```
 
 ### 3. inode 读取 `squashfs_iget`（inode.c）
 
 ```text
-squashfs_iget
-├── iget_locked                              // VFS inode 缓存
-└── [I_NEW] squashfs_read_inode
-    ├── squashfs_read_metadata               // 读 16B squashfs_base_inode
-    ├── squashfs_new_inode
-    │   ├── squashfs_get_id(uid 索引)        [id.c]
-    │   │   └── squashfs_read_metadata       //   查 id 表
-    │   └── squashfs_get_id(gid 索引)
-    └── switch (inode_type)                  // 14 种类型
-        ├── REG_TYPE / LREG_TYPE:
-        │   ├── squashfs_read_metadata       //   文件 inode 主体
-        │   └── [有 fragment] squashfs_frag_lookup   [fragment.c]
-        │       └── squashfs_read_metadata   //     查 fragment 表项
-        ├── DIR/LDIR, SYMLINK, DEV, IPC: squashfs_read_metadata(...)
-        └── [有 xattr] squashfs_xattr_lookup [xattr_id.c]
+squashfs_iget(sb, ino, ino_number)                          [fs/squashfs/inode.c:79]
+├── iget_locked(sb, ino_number)                             // VFS inode 缓存; 非 I_NEW 直接返回
+└── [I_NEW] squashfs_read_inode(inode, ino)                 [fs/squashfs/inode.c:107]
+    ├── squashfs_read_metadata                              // 读 16B squashfs_base_inode
+    ├── squashfs_new_inode                                  [fs/squashfs/inode.c:44]
+    │   └── squashfs_get_id ×2 (uid/gid)                    [fs/squashfs/id.c:33]
+    │       └── squashfs_read_metadata                      // 查 id 表
+    ├── switch (inode_type)                                 // 14 种类型
+    │   ├── REG / LREG:
+    │   │   ├── squashfs_read_metadata                      //   文件 inode 主体
+    │   │   └── [有 fragment] squashfs_frag_lookup          [fs/squashfs/fragment.c:35]
+    │   │       └── squashfs_read_metadata                  // 查 fragment 表项
+    │   ├── DIR / LDIR: squashfs_read_metadata              // 目录 inode 主体
+    │   ├── SYMLINK / LSYMLINK: squashfs_read_metadata      // 符号链接 inode 主体
+    │   │   └── [LSYMLINK] squashfs_read_metadata ×2        // 链接目标 + xattr id
+    │   ├── DEV (BLK/CHR 及长格式): squashfs_read_metadata  // 设备 inode 主体
+    │   └── IPC (FIFO/SOCKET 及长格式): squashfs_read_metadata  // FIFO/socket inode 主体
+    └── [有 xattr] squashfs_xattr_lookup                    [fs/squashfs/xattr_id.c:29]
+        └── squashfs_read_metadata                          // 查 xattr id 表
 ```
 
 ### 4. 元数据读取公共路径 `squashfs_read_metadata`（cache.c）
