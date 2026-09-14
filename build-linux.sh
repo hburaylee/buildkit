@@ -3,7 +3,7 @@
 app="linux"
 repo="https://cnb.cool/rayylee/linux"
 
-app_dir="/workspace/$app"
+app_dir="$app"
 
 echo ">>> build ${app}"
 
