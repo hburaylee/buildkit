@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "DISABLE_UPDATES": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "_ANTHROPIC_DEFAULT_OPUS_MODEL": "sophnet/claude-fable-5",
+    "__ANTHROPIC_DEFAULT_OPUS_MODEL": "sophnet/DeepSeek-V4-Pro-0813",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "sophnet/claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "sophnet/deepseek-v4-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "sophnet/qwen3.5-flash"
+  },
+  "model": "opus[1m]",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true
+  }
+}

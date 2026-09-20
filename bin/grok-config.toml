@@ -1,0 +1,36 @@
+[mcp_servers.rust-dev-mcp]
+command = "rust-dev-mcp"
+args = []
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[model.glm]
+model = "sophnet/GLM-5.3"
+name = "sophnet/GLM-5.3"
+env_key = "MAAS_API_KEY"
+api_backend = "chat_completions"
+context_window = 1000000
+
+[model.deepseek]
+model = "sophnet/DeepSeek-V4-Pro-0813"
+name = "sophnet/DeepSeek-V4-Pro-0813"
+env_key = "MAAS_API_KEY"
+api_backend = "chat_completions"
+context_window = 1000000
+
+[models]
+default = "deepseek"
+
+[marketplace]
+default_skills_installs_purged = true
+
+[ui]
+compact_mode = true
+max_thoughts_width = 120
+yolo = false
+permission_mode = "always-approve"
+theme = "groknight"
+
+[cli]
+installer = "internal"
