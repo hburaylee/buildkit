@@ -9,6 +9,16 @@ app_dir="$cur_dir/$app"
 
 echo ">>> build ${app}"
 
+fetch_image() {
+    local downloader="$1"
+    local url="$2"
+    if [ "$downloader" = "curl" ]; then
+        curl -sL -m 10 "$url" 2>/dev/null
+    else
+        timeout 10 wget -q --tries=1 -O - "$url" 2>/dev/null
+    fi
+}
+
 do_sync() {
     git remote add github https://github.com/asterinas/asterinas
     git fetch github
@@ -82,12 +92,24 @@ fi
 docker_id=$(docker ps -a 2>/dev/null | grep -m 1 raylee-aster | awk '{print $1}')
 
 if [ -z "$docker_id" ]; then
-    docker_tag=$(curl -s -m 10 "https://registry.hub.docker.com/v2/repositories/asterinas/dev/tags?page_size=100" 2>/dev/null | \
-        jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
+    downloader="curl"
+    if command -v curl >/dev/null 2>&1; then
+        downloader="curl"
+    elif command -v wget >/dev/null 2>&1; then
+        downloader="wget"
+    else
+        echo "[Err] no found curl or wget" >&2
+        exit 1
+    fi
+
+    docker_tag=$(fetch_image $downloader "https://registry.hub.docker.com/v2/repositories/asterinas/dev/tags?page_size=100" \
+        | jq -r '.results[].name' 2>/dev/null | sort -V | tail -n 1)
     [ -z "$docker_tag" ] && \
-        docker_tag=$(curl -sL -m 10 https://raw.githubusercontent.com/asterinas/asterinas/main/DOCKER_IMAGE_VERSION 2>/dev/null | tail -n 1)
+        docker_tag=$(fetch_image $downloader "https://raw.githubusercontent.com/asterinas/asterinas/main/DOCKER_IMAGE_VERSION" \
+        | tail -n 1)
     [ -z "$docker_tag" ] && \
-        docker_tag=$(curl -sL -m 10 https://cdn.jsdelivr.net/gh/asterinas/asterinas@main/DOCKER_IMAGE_VERSION 2>/dev/null | tail -n 1)
+        docker_tag=$(fetch_image $downloader "https://cdn.jsdelivr.net/gh/asterinas/asterinas@main/DOCKER_IMAGE_VERSION" \
+        | tail -n 1)
 
     DOCKER_ARGS=(
         -v /sys:/sys:ro
