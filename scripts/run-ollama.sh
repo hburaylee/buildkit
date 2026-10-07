@@ -1,6 +1,28 @@
 #!/usr/bin/env bash
 #
 
+#  # /etc/systemd/system/ollama.service
+#  [Unit]
+#  Description=Ollama Service
+#  After=network-online.target
+#
+#  [Service]
+#  ExecStartPre=/bin/bash -c 'mountpoint -q /root || mount /dev/nvme0n1 /root'
+#  ExecStart=/usr/local/bin/ollama serve
+#  User=root
+#  Group=root
+#  Restart=always
+#  RestartSec=3
+#  Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#  Environment="OLLAMA_HOST=0.0.0.0:11444"
+#
+#  Environment="OLLAMA_FLASH_ATTENTION=1"
+#  Environment="OLLAMA_CONTEXT_LENGTH=131072"
+#  # Environment="OLLAMA_KV_CACHE_TYPE=q8_0"
+#
+#  [Install]
+#  WantedBy=multi-user.target
+
 
 # ollama
 # Base URL: http://localhost:11434/api/chat (暂不支持  http://localhost:11434/v1/chat/completions)
