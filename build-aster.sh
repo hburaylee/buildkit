@@ -61,7 +61,7 @@ do_gdbserver() {
 if [ -e Cargo.toml ]; then
     app_dir="$(pwd)"
 else
-    [ ! -d ${app} ] && git clone https://github.com/rayylee/asterinas
+    [ ! -d ${app} ] && git clone https://github.com/hburaylee/asterinas
 fi
 
 if [ -n "$1" ]; then
