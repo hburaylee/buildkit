@@ -1,5 +1,5 @@
-[mcp_servers.rust-dev-mcp]
-command = "rust-dev-mcp"
+[mcp_servers.rust-lsp-mcp]
+command = "rust-lsp-mcp"
 args = []
 enabled = true
 startup_timeout_sec = 30
