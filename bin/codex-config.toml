@@ -1,0 +1,7 @@
+model_provider = "my-maas"
+model = "sophnet/DeepSeek-V4-Pro-0813"
+
+[model_providers.my-maas]
+name = "My MaaS"
+env_key = "MAAS_API_KEY"
+wire_api = "responses"

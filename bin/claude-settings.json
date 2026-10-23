@@ -11,8 +11,5 @@
   },
   "model": "opus[1m]",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true
-  }
+  "theme": "dark"
 }
