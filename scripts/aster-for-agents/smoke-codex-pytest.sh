@@ -2,12 +2,19 @@
 
 # codex-cli 0.166.0
 # smoke-codex-pytest.sh
+#
+# ├── /root/codex
+# │   ├── [source code]
+# │   ├── codex-symbols-x86_64-unknown-linux-musl.tar.gz
+# │   ├── codex-symbols-x86_64-unknown-linux-musl-app-server.tar.gz
+# │   ├── codex-app-server-package-x86_64-unknown-linux-musl.tar.gz
+# │   └── codex-package-x86_64-unknown-linux-musl.tar.gz
 
 export UV_PYTHON=/run/current-system/sw/bin/python3.12
 export PYTHONPATH="/root/codex/sdk/python/src:/root/codex/sdk/python/tests"
 export BASE=/root/codex
 
-pushd codex/scripts/codex_package/smoke_tests
+pushd /root/codex/scripts/codex_package/smoke_tests
     uv run --frozen pytest -v --compression gzip \
         --package-target x86_64-unknown-linux-musl \
         --cli-archive "$BASE/codex-package-x86_64-unknown-linux-musl.tar.gz" \
