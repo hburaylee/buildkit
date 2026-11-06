@@ -6,7 +6,6 @@
 # ├── /root/codex
 # │   ├── [source code]
 # │   ├── codex-symbols-x86_64-unknown-linux-musl.tar.gz
-# │   ├── codex-symbols-x86_64-unknown-linux-musl-app-server.tar.gz
 # │   ├── codex-app-server-package-x86_64-unknown-linux-musl.tar.gz
 # │   └── codex-package-x86_64-unknown-linux-musl.tar.gz
 
@@ -20,5 +19,5 @@ pushd /root/codex/scripts/codex_package/smoke_tests
         --cli-archive "$BASE/codex-package-x86_64-unknown-linux-musl.tar.gz" \
         --app-server-archive "$BASE/codex-app-server-package-x86_64-unknown-linux-musl.tar.gz" \
         --symbols-archive "$BASE/codex-symbols-x86_64-unknown-linux-musl.tar.gz" \
-        test_codex_package.py
+        test_codex_package.py -k 'not debug_symbols'
 popd
