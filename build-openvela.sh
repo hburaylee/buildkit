@@ -231,7 +231,7 @@ cmd_emulator() {
     info "启动 Vela Emulator..."
     (
         cd "${OPENVELA_DIR}"
-        ./emulator.sh "cmake_out/vela_${VELACLAW_CONFIG}"
+        ./emulator.sh "cmake_out/vela_${VELACLAW_CONFIG}" -no-window
     )
 }
 
