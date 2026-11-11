@@ -6,21 +6,15 @@ startup_timeout_sec = 30
 tool_timeout_sec = 120
 
 [model.glm]
-model = "sophnet/GLM-5.3"
-name = "sophnet/GLM-5.3"
-env_key = "MAAS_API_KEY"
-api_backend = "chat_completions"
-context_window = 1000000
-
-[model.deepseek]
-model = "sophnet/DeepSeek-V4-Pro-0813"
-name = "sophnet/DeepSeek-V4-Pro-0813"
-env_key = "MAAS_API_KEY"
+model = "glm-5.3"
+name = "glm-5.3"
+base_url = "https://open.bigmodel.cn/api/coding/paas/v4"
+env_key = "ZAI_API_KEY"
 api_backend = "chat_completions"
 context_window = 1000000
 
 [models]
-default = "deepseek"
+default = "glm"
 
 [marketplace]
 default_skills_installs_purged = true
