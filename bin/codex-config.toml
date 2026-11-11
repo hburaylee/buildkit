@@ -1,7 +1,13 @@
-model_provider = "my-maas"
-model = "sophnet/DeepSeek-V4-Pro-0813"
+model_provider = "ZAI"
+model = "glm-5.3"
+model_reasoning_effort = "max"
+model_catalog_json = "~/.codex/models.json"
 
-[model_providers.my-maas]
-name = "My MaaS"
-env_key = "MAAS_API_KEY"
+[model_providers.ZAI]
+name = "ZAI"
+base_url = "https://open.bigmodel.cn/api/v1"
+env_key = "ZAI_API_KEY"
 wire_api = "responses"
+
+[features]
+daemon_auto_start = false
