@@ -15,7 +15,7 @@
 #      qemu-virt-a64 时残留的 .o 会导致 "file in wrong format" 链接失败，
 #      本脚本用 .last-board 标记自动检测并清理。
 #   2. 该构建系统无头文件依赖追踪（make.obj 跨次累积），每次全量重建。
-#   3. qemu-virt-a64 的交叉工具链在 /opt/aarch64-tc（不在默认 PATH）。
+#   3. qemu-virt-a64 的交叉工具链在默认 PATH
 
 set -euo pipefail
 
@@ -53,13 +53,12 @@ case "$BOARD" in
         TOOLCHAIN="arm-none-eabi-gcc"
         ;;
     qemu-virt-a64)
-        export PATH="/opt/aarch64-tc/bin:${PATH}"
         TOOLCHAIN="aarch64-none-elf-gcc"
         ;;
 esac
 
 if ! command -v "${TOOLCHAIN}" >/dev/null 2>&1; then
-    echo "错误: 找不到 ${TOOLCHAIN}（qemu-virt-a64 需要 /opt/aarch64-tc 工具链）" >&2
+    echo "错误: 找不到 ${TOOLCHAIN}（qemu-virt-a64 需要 aarch64-none-elf-gcc 工具链）" >&2
     exit 1
 fi
 
