@@ -152,4 +152,4 @@ case "${1:-build}" in
     *)         die "未知命令: $1 (执行 $(basename "$0") help 查看用法)" ;;
 esac
 
-return 0
+exit 0
