@@ -19,8 +19,11 @@
 
 set -euo pipefail
 
-BUILDKIT="/workspace/buildkit"
-XIUOS_ROOT="${BUILDKIT}/xiuos/Ubiquitous/XiZi_AIoT_Micro"
+BUILDKIT="${BUILDKIT:-/workspace/buildkit}"
+XIUOS_REPO_URL="https://cnb.cool/rayylee/xiuos"
+XIUOS_REPO_BRANCH="multi-kernel"
+XIUOS_REPO_DIR="${BUILDKIT}/xiuos"
+XIUOS_ROOT="${XIUOS_REPO_DIR}/Ubiquitous/XiZi_AIoT_Micro"
 PORT_BUILD="${BUILDKIT}/packages_ai_agent/platform/xiuos/build"
 LAST_BOARD_MARKER="${PORT_BUILD}/.last-board"
 
@@ -29,7 +32,7 @@ FORCE_CLEAN_PORT=0
 BOARD="imx6q-sabrelite"
 
 usage() {
-    sed -n '3,15p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '3,13p' "$0" | sed 's/^# \{0,1\}//'
     exit 0
 }
 
@@ -46,6 +49,30 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+
+# ── 下载代码：仓库不存在时自动克隆 ──
+if [ ! -d "${XIUOS_REPO_DIR}/.git" ]; then
+    if [ -e "${XIUOS_REPO_DIR}" ]; then
+        echo "错误: ${XIUOS_REPO_DIR} 已存在但不是 git 仓库，请手动处理后再运行" >&2
+        exit 1
+    fi
+    echo "==> 首次运行: 克隆 ${XIUOS_REPO_URL}（分支: ${XIUOS_REPO_BRANCH}）"
+    mkdir -p "${BUILDKIT}"
+    if ! git clone -b "${XIUOS_REPO_BRANCH}" "${XIUOS_REPO_URL}" "${XIUOS_REPO_DIR}"; then
+        echo "错误: 克隆 xiuos 仓库失败，请确认已安装 git 且网络可达" >&2
+        exit 1
+    fi
+else
+    CURRENT_BRANCH="$(git -C "${XIUOS_REPO_DIR}" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    if [ -n "${CURRENT_BRANCH}" ] && [ "${CURRENT_BRANCH}" != "${XIUOS_REPO_BRANCH}" ]; then
+        echo "==> 注意: 仓库当前分支为 ${CURRENT_BRANCH}，将按已检出代码构建（预期分支: ${XIUOS_REPO_BRANCH}）"
+    fi
+fi
+
+if [ ! -d "${XIUOS_ROOT}" ]; then
+    echo "错误: 内核目录不存在: ${XIUOS_ROOT}（请确认仓库分支/目录结构）" >&2
+    exit 1
+fi
 
 # ── 按板型准备工具链 ────────────────────────────────────────────────
 case "$BOARD" in
