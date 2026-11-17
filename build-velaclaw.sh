@@ -23,12 +23,15 @@
 #   VELACLAW_JOBS         编译并行数   (默认: nproc)
 #   VELACLAW_BUILD_TYPE   构建类型     (默认: Release)
 #   VELACLAW_CMAKE_EXTRA  附加 CMake 参数, 如 "-DAGENT_ENABLE_MCP=ON"
+#   AGENT_LOG_LEVEL       运行日志级别 (默认: info; 可用 debug/warning/error)
 #
 # 示例:
 #   ./build-velaclaw.sh                                  # 下载 + 静态编译
 #   ./build-velaclaw.sh build                            # 只编译
 #   VELACLAW_CMAKE_EXTRA="-DAGENT_ENABLE_MCP=ON -DAGENT_ENABLE_MQTT=ON" \
 #       ./build-velaclaw.sh build                        # 静态编译(开 MCP+MQTT)
+#   AGENT_LOG_LEVEL=error ./packages_ai_agent/build-linux/ai_agent
+#                                                        # 运行并隐藏 [I] 信息日志
 #
 # 产物: ${VELACLAW_DIR}/build-linux/ai_agent (完全静态链接, 可直接拷贝到其他
 # x86-64 Linux 运行; strip 后约 2.1MB)
@@ -126,6 +129,7 @@ do_build() {
         warn "链接方式: 未检测到静态链接, 请检查 libmbedtls-dev 是否提供 .a 静态库"
     fi
     info "运行: ${bin}   (数据目录 ${BUILD_DIR}/agent-data/)"
+    info "静默运行: AGENT_LOG_LEVEL=error ./packages_ai_agent/build-linux/ai_agent"
     info "瘦身 (可选): strip ${bin}"
 }
 
